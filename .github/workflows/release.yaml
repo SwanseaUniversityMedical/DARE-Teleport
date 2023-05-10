@@ -1,0 +1,174 @@
+name: Build and Release Chart
+
+on:
+  push:
+    paths:
+      - '.github/workflows/release.yaml'
+      - 'charts/**'
+    branches:
+      - '**'
+
+jobs:
+  release-chart:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v3
+
+      - name: generate token
+        id: generate-token
+        uses: tibdex/github-app-token@v1.8.0
+        with:
+          app_id: ${{ vars.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: install helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+          token: ${{ steps.generate-token.outputs.token }}
+
+      - name: semantic release dry run
+        uses: docker://ghcr.io/codfish/semantic-release-action:v2
+        id: semantic-dry
+        with:
+          dry_run: true
+
+          branches: |
+            [
+              '+([0-9])?(.{+([0-9]),x}).x',
+              'main'
+            ]
+
+          plugins: |-
+            [
+              ['@semantic-release/commit-analyzer', {
+                "releaseRules": [
+                  {"type": "major", "release": "major"},
+                  {"type": "minor", "release": "minor"},
+                  {"type": "patch", "release": "patch"},
+                  {"type": "no-release", "release": false},
+            
+                  {"type": "chore", "release": "patch"},
+                  {"type": "refactor", "release": "patch"},
+                  {"type": "style", "release": "patch"},
+                  
+                  {"type": "docs", "release": false},
+                  {"type": "test", "release": false},
+                  {"type": "ci", "release": false},
+                  
+                  {"type": "feat", "release": "minor"},
+                  
+                  {"type": "revert", "release": "patch"},
+                  {"type": "perf", "release": "patch"},
+                  {"type": "fix", "release": "patch"},
+                  {"type": "build", "release": "patch"},
+                ],
+              }]
+            ]
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+
+      - name: helm package
+        if: steps.semantic-dry.outputs.new-release-published == 'true'
+        run: |
+          set -x
+          helm package ./charts/$HARBOR_REPO -d . --version $TAG --app-version $TAG
+          tar -xzf $(echo *.tgz) -C ./charts $HARBOR_REPO/Chart.yaml
+        env:
+          HARBOR_REPO: ${{ vars.HARBOR_REPO }}
+          TAG: ${{ steps.semantic-dry.outputs.release-version }}
+
+      - name: semantic release
+        if: steps.semantic-dry.outputs.new-release-published == 'true'
+        uses: docker://ghcr.io/codfish/semantic-release-action:v2
+        id: semantic
+        with:
+          branches: |
+            [
+              '+([0-9])?(.{+([0-9]),x}).x',
+              'main'
+            ]
+
+          additional_packages: |
+            ['@semantic-release/exec', '@semantic-release/git']
+
+          plugins: |-
+            [
+              ['@semantic-release/commit-analyzer', {
+                "releaseRules": [
+                  {"type": "major", "release": "major"},
+                  {"type": "minor", "release": "minor"},
+                  {"type": "patch", "release": "patch"},
+                  {"type": "no-release", "release": false},
+            
+                  {"type": "chore", "release": "patch"},
+                  {"type": "refactor", "release": "patch"},
+                  {"type": "style", "release": "patch"},
+                  
+                  {"type": "docs", "release": false},
+                  {"type": "test", "release": false},
+                  {"type": "ci", "release": false},
+                  
+                  {"type": "feat", "release": "minor"},
+                  
+                  {"type": "revert", "release": "patch"},
+                  {"type": "perf", "release": "patch"},
+                  {"type": "fix", "release": "patch"},
+                  {"type": "build", "release": "patch"},
+                ],
+              }], 
+              ['@semantic-release/exec', { 
+                "generateNotesCmd": "echo '${ process.env.RELEASE_NOTES }'" 
+              }],
+              '@semantic-release/release-notes-generator',
+              ['@semantic-release/git', {
+                "assets": ["./charts/**"],
+                "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+              }],
+              ['@semantic-release/github', {
+                "successComment": false,
+                "failTitle": false
+              }]
+            ]
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          HARBOR_REGISTRY: ${{ vars.HARBOR_REGISTRY }}
+          HARBOR_PROJECT: ${{ vars.HARBOR_PROJECT }}
+          HARBOR_REPO: ${{ vars.HARBOR_REPO }}
+          RELEASE_NOTES: |
+            ```
+            helm repo add --pass-credentials --username <username> --password <password> <repo> https://${{ vars.HARBOR_REGISTRY }}/chartrepo/${{ vars.HARBOR_PROJECT }}
+            helm pull --version ${{ steps.semantic-dry.outputs.release-version }} <repo>/${{ vars.HARBOR_REPO }}
+            ls *.tgz
+            # ${{ vars.HARBOR_REPO }}-${{ steps.semantic-dry.outputs.release-version }}.tgz
+            ```
+
+      - name: helm push to registry
+        id: chart-push
+        if: steps.semantic.outputs.new-release-published == 'true'
+        run: |
+          set -x
+          helm plugin install https://github.com/chartmuseum/helm-push
+          helm repo add --pass-credentials --username "$HARBOR_USER" --password "$HARBOR_TOKEN" harbor https://$HARBOR_REGISTRY/chartrepo/$HARBOR_PROJECT
+          helm cm-push $(echo *.tgz) harbor
+          sleep 2
+          helm repo update
+          helm pull harbor/$HARBOR_REPO --version $TAG
+        env:
+          HARBOR_REGISTRY: ${{ vars.HARBOR_REGISTRY }}
+          HARBOR_PROJECT: ${{ vars.HARBOR_PROJECT }}
+          HARBOR_REPO: ${{ vars.HARBOR_REPO }}
+          HARBOR_USER: ${{ vars.HARBOR_USER }}
+          HARBOR_TOKEN: ${{ secrets.HARBOR_TOKEN }}
+          TAG: ${{ steps.semantic.outputs.release-version }}
+
+      - name: delete orphaned release on chart push failure
+        uses: dev-drprasad/delete-tag-and-release@v0.2.1
+        if: (failure() && steps.chart-push.outcome == 'failure') && steps.semantic.outputs.new-release-published == 'true'
+        with:
+          tag_name: v${{ steps.semantic.outputs.release-version }}
+          delete_release: true
+        env:
+          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}

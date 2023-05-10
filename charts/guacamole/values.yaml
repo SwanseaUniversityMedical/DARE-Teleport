@@ -1,0 +1,22 @@
+
+########################################################################################################################
+# GUACAMOLE
+########################################################################################################################
+
+app-guacamole:
+  enabled: true
+
+  argocd:
+    namespace: argocd
+    project: default
+
+  namespace: guacamole
+
+  source:
+    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    chart: guacamole
+    # renovate: datasource=helm depName=guacamole registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    targetRevision: 1.1.0
+
+#  values:
+#    foo: bar
