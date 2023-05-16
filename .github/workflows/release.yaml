@@ -75,6 +75,7 @@ jobs:
         run: |
           set -x
           helm package ./charts/$HARBOR_REPO -d . --version $TAG --app-version $TAG
+          tar -ztvf $(echo *.tgz)
           tar -xzf $(echo *.tgz) -C ./charts $HARBOR_REPO/Chart.yaml
         env:
           HARBOR_REPO: ${{ vars.HARBOR_REPO }}
