@@ -1,0 +1,34 @@
+{{- if .Values.appPromStack.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-prom-stack
+  namespace: {{ .Values.global.mon.argocd.namespace }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: prom-operator
+    server: {{ .Values.global.mon.address }}
+  project: {{ .Values.global.mon.argocd.project }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:  
+    - CreateNamespace=true
+  source:
+    repoURL: {{ default .Values.global.repoURL .Values.appPromStack.source.repoURL }}
+    chart: {{ .Values.appPromStack.source.chart }}
+    targetRevision: {{ .Values.appPromStack.source.targetRevision }}
+
+    helm:
+      valueFiles:
+        - values.yaml
+      {{- if .Values.appPromStack.values }}
+      values: |
+        {{- .Values.appPromStack.values | toYaml | nindent 8 }}
+      {{- end }}
+{{- end }}
