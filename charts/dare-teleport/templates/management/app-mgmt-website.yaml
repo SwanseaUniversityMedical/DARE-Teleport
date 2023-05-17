@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-vault
+  name: app-mgmt-website
   namespace: {{ .Values.global.mgmt.argocd.namespace }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
@@ -10,7 +10,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   destination:
-    namespace: vault
+    namespace: management-website
     server: {{ .Values.global.mgmt.address }}
   project: {{ .Values.global.mgmt.argocd.project }}
   syncPolicy:

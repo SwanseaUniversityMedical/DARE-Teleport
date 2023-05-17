@@ -10,7 +10,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   destination:
-    namespace: vault
+    namespace: opa
     server: {{ .Values.global.mgmt.address }}
   project: {{ .Values.global.mgmt.argocd.project }}
   syncPolicy:
