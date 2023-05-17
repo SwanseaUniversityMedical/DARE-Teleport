@@ -49,6 +49,7 @@ app-guacamole:
 appVault:
   enabled: true
   source:
+    repoURL: https://helm.releases.hashicorp.com
     chart: vault
     targetRevision: 0.24.1
 

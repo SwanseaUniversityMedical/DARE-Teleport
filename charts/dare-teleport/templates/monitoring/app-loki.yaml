@@ -20,10 +20,7 @@ spec:
     syncOptions:  
     - CreateNamespace=true
   source:
-    repoURL: {{ default .Values.global.repoURL .Values.appLoki.source.repoURL }}
-    chart: {{ .Values.appLoki.source.chart }}
-    targetRevision: {{ .Values.appLoki.source.targetRevision }}
-
+    {{- .Values.appLoki.source | toYaml | nindent 4 }}
     helm:
       valueFiles:
         - values.yaml
