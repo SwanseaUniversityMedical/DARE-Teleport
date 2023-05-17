@@ -21,10 +21,10 @@ spec:
       valueFiles:
         - values.yaml
 
-{{ if (index .Values "app-guacamole").values }}
+{{- if (index .Values "app-guacamole").values }}
       values: |
-{{ (index .Values "app-guacamole").values | toYaml | indent 8 }}
-{{ end}}
+{{- (index .Values "app-guacamole").values | toYaml | indent 8 }}
+{{- end}}
 
   destination:
     server: https://kubernetes.default.svc
