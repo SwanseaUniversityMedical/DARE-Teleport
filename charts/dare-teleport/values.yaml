@@ -2,8 +2,6 @@
 # GLOBAL SETTINGS
 ########################################################################################################################
 global:
-  # this will eventually be replaced by an internal address to the bundled nexus
-  repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
   mgmt:
     address: https://kubernetes.default.svc
     argocd:
