@@ -58,8 +58,9 @@ appVault:
 appOpa:
   enabled: true
   source:
+    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
     chart: opa
-    targetRevision: 11.0.0
+    targetRevision: 0.0.1
 
 
 ########################################################################################################################
@@ -68,8 +69,9 @@ appOpa:
 appManagementWebsite:
   enabled: true
   source:
+    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
     chart: manweb
-    targetRevision: 11.0.0
+    targetRevision: 0.0.1
 
 
 ########################################################################################################################
@@ -81,8 +83,9 @@ appManagementWebsite:
 appPromStack:
   enabled: true
   source:
+    repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
-    targetRevision: 11.0.0
+    targetRevision: 45.28.0
 
 ########################################################################################################################
 # LOKI
@@ -90,5 +93,6 @@ appPromStack:
 appLoki:
   enabled: true
   source:
+    repoURL: https://grafana.github.io/helm-charts
     chart: loki-stack
-    targetRevision: 11.0.0
+    targetRevision: 2.9.10
