@@ -28,6 +28,7 @@ appGuacamole:
 
 appJupyter:
   enabled: true
+  namespace: jupyter
   source:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
     chart: jupyter
