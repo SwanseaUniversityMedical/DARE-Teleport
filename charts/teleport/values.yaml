@@ -26,6 +26,15 @@ appGuacamole:
     # renovate: datasource=helm depName=guacamole registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
     targetRevision: 1.1.0
 
+appJupyter:
+  enabled: true
+  source:
+    # This will eventually point to our custom internal chart
+    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    chart: jupyter
+    # renovate: datasource=helm depName=jupyter registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    targetRevision: 1.0.0
+
 appVault:
   enabled: true
   namespace: vault
