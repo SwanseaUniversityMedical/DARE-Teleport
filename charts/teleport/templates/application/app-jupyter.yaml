@@ -1,8 +1,8 @@
-{{- if .Values.appGuacamole.enabled }}
+{{- if .Values.appJupyter.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-guacamole
+  name: app-jupyter
   namespace: {{ .Values.global.application.argocd.namespace }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
@@ -10,7 +10,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   destination:
-    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appGuacamole.namespace }}"
+    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appJupyter.namespace }}"
     server: {{ .Values.global.application.address }}
   project: {{ .Values.global.application.argocd.project }}
   syncPolicy:
@@ -20,12 +20,12 @@ spec:
     syncOptions:  
     - CreateNamespace=true
   source:
-    {{- .Values.appGuacamole.source | toYaml | nindent 4 }}
+    {{- .Values.appJupyter.source | toYaml | nindent 4 }}
     helm:
       valueFiles:
         - values.yaml
-      {{- if .Values.appGuacamole.values }}
+      {{- if .Values.appJupyter.values }}
       values: |
-        {{- .Values.appGuacamole.values | toYaml | nindent 8 }}
+        {{- .Values.appJupyter.values | toYaml | nindent 8 }}
       {{- end }}
 {{- end }}
