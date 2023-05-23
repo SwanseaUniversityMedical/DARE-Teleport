@@ -1,0 +1,31 @@
+{{- if .Values.appVault.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-vault
+  namespace: {{ .Values.global.management.argocd.namespace }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appVault.namespace }}"
+    server: {{ .Values.global.management.address }}
+  project: {{ .Values.global.management.argocd.project }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:  
+    - CreateNamespace=true
+  source:
+    {{- .Values.appVault.source | toYaml | nindent 4 }}
+    helm:
+      valueFiles:
+        - values.yaml
+      {{- if .Values.appVault.values }}
+      values: |
+        {{- .Values.appVault.values | toYaml | nindent 8 }}
+      {{- end }}
+{{- end }}

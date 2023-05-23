@@ -1,22 +1,75 @@
 
-########################################################################################################################
-# GUACAMOLE
-########################################################################################################################
+global:
+  namespacePrefix: dare
+  application:
+    address: https://kubernetes.default.svc
+    argocd:
+      namespace: argocd
+      project: default
+  management:
+    address: https://kubernetes.default.svc
+    argocd:
+      namespace: argocd
+      project: default
+  monitoring:
+    address: https://kubernetes.default.svc
+    argocd:
+      namespace: argocd
+      project: default
 
 appGuacamole:
   enabled: true
-
-  argocd:
-    namespace: argocd
-    project: default
-
   namespace: guacamole
-
   source:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
     chart: guacamole
     # renovate: datasource=helm depName=guacamole registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
     targetRevision: 1.1.0
 
-#  values:
-#    foo: bar
+appVault:
+  enabled: true
+  namespace: vault
+  source:
+    repoURL: https://helm.releases.hashicorp.com
+    chart: vault
+    # renovate: datasource=helm depName=vault registryUrl=https://helm.releases.hashicorp.com
+    targetRevision: 0.24.1
+
+appOpa:
+  enabled: true
+  namespace: opa
+  source:
+    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    chart: opa
+    # renovate: datasource=helm depName=opa registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    targetRevision: 1.0.0
+
+appControl:
+  enabled: true
+  namespace: control
+  source:
+    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    chart: control
+    # renovate: datasource=helm depName=control registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    targetRevision: 1.1.0
+
+appPromStack:
+  enabled: true
+  namespace: monitoring
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
+    targetRevision: 45.28.0
+
+appLoki:
+  enabled: true
+  namespace: monitoring
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: loki-stack
+    # renovate: datasource=helm depName=loki-stack registryUrl=https://grafana.github.io/helm-charts
+    targetRevision: 2.9.10
+  values:
+    loki:
+      isDefault: false

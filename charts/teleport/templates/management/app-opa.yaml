@@ -1,0 +1,31 @@
+{{- if .Values.appOpa.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-opa
+  namespace: {{ .Values.global.management.argocd.namespace }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appOpa.namespace }}"
+    server: {{ .Values.global.management.address }}
+  project: {{ .Values.global.management.argocd.project }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:  
+    - CreateNamespace=true
+  source:
+    {{- .Values.appOpa.source | toYaml | nindent 4 }}
+    helm:
+      valueFiles:
+        - values.yaml
+      {{- if .Values.appOpa.values }}
+      values: |
+        {{- .Values.appOpa.values | toYaml | nindent 8 }}
+      {{- end }}
+{{- end }}
