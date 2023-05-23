@@ -29,7 +29,6 @@ appGuacamole:
 appJupyter:
   enabled: true
   source:
-    # This will eventually point to our custom internal chart
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
     chart: jupyter
     # renovate: datasource=helm depName=jupyter registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
