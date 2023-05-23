@@ -1,0 +1,31 @@
+{{- if .Values.appGuacamole.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-loki
+  namespace: {{ .Values.global.monitoring.argocd.namespace }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appGuacamole.namespace }}"
+    server: {{ .Values.global.monitoring.address }}
+  project: {{ .Values.global.monitoring.argocd.project }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:  
+    - CreateNamespace=true
+  source:
+    {{- .Values.appGuacamole.source | toYaml | nindent 4 }}
+    helm:
+      valueFiles:
+        - values.yaml
+      {{- if .Values.appGuacamole.values }}
+      values: |
+        {{- .Values.appGuacamole.values | toYaml | nindent 8 }}
+      {{- end }}
+{{- end }}

@@ -3,16 +3,16 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: app-opa
-  namespace: {{ .Values.global.mgmt.argocd.namespace }}
+  namespace: {{ .Values.global.management.argocd.namespace }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   destination:
-    namespace: opa
-    server: {{ .Values.global.mgmt.address }}
-  project: {{ .Values.global.mgmt.argocd.project }}
+    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appOpa.namespace }}"
+    server: {{ .Values.global.management.address }}
+  project: {{ .Values.global.management.argocd.project }}
   syncPolicy:
     automated:
       selfHeal: true
