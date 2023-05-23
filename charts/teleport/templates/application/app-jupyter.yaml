@@ -3,7 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: app-jupyter
-  namespace: {{ .Values.global.monitoring.argocd.namespace }}
+  namespace: {{ .Values.global.application.argocd.namespace }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
   annotations:
@@ -11,8 +11,8 @@ metadata:
 spec:
   destination:
     namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appJupyter.namespace }}"
-    server: {{ .Values.global.monitoring.address }}
-  project: {{ .Values.global.monitoring.argocd.project }}
+    server: {{ .Values.global.application.address }}
+  project: {{ .Values.global.application.argocd.project }}
   syncPolicy:
     automated:
       selfHeal: true
