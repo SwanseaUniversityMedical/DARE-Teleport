@@ -35,6 +35,24 @@ appJupyter:
     # renovate: datasource=helm depName=jupyter registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
     targetRevision: 1.0.0
 
+appTrino:
+  enabled: true
+  namespace: trino
+  source:
+    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    chart: trino
+    # renovate: datasource=helm depName=trino registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    targetRevision: 1.0.1
+
+appHive:
+  enabled: true
+  namespace: hive
+  source:
+    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    chart: hive
+    # renovate: datasource=helm depName=hive registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    targetRevision: 1.0.0
+
 appVault:
   enabled: true
   namespace: vault
