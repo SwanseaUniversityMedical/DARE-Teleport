@@ -1,18 +1,18 @@
-{{ if (index .Values "app-guacamole").enabled }}
+{{ if .Values.appGuacamole.enabled }}
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: app-guacamole
-  namespace: {{ (index .Values "app-guacamole").argocd.namespace }}
+  namespace: {{ .Values.appGuacamole.argocd.namespace }}
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
     name: app-guacamole
 spec:
-  project: {{ (index .Values "app-guacamole").argocd.project }}
+  project: {{ .Values.appGuacamole.argocd.project }}
 
   source:
-{{ (index .Values "app-guacamole").source | toYaml | indent 4 }}
+    {{- .Values.appGuacamole.source | toYaml | indent 4 }}
 
     helm:
       version: v3
@@ -21,14 +21,14 @@ spec:
       valueFiles:
         - values.yaml
 
-{{- if (index .Values "app-guacamole").values }}
+      {{- if .Values.appGuacamole.values }}
       values: |
-{{- (index .Values "app-guacamole").values | toYaml | indent 8 }}
-{{- end}}
+        {{- .Values.appGuacamole.values | toYaml | indent 8 }}
+      {{- end}}
 
   destination:
     server: https://kubernetes.default.svc
-    namespace: {{ (index .Values "app-guacamole").namespace }}
+    namespace: {{ .Values.appGuacamole.namespace }}
 
   syncPolicy:
     automated:
