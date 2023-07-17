@@ -15,7 +15,7 @@ Available states are:
 
 Requirements
 ------------
-Only uses Ansible builtin modules.
+- kubernetes.core
 
 Role Variables
 --------------
@@ -120,6 +120,7 @@ groupvars
 | k3s_vip | yes | | IP address | unassigned IP address to be used as the HA loadbalanced address |
 | k3s_vip_port | yes | | integer | port to use for the HA loadbalancer, e.g. 8443 |
 | k3s_encryption_secret | yes | | b64 encoded 16, 24, 32 char string | Encryption string for CIS compliant encryption of data in the K3s etcd datastore. Do not put this in the inventory file in plain text, this is a sensitive secret. |
+| k3s_metallb_addresses | yes | | list of strings | List of IP addresses (in CIDR block notation) to make available to the MetalLB load balancer that will be installed on the cluster |
 
 
 Dependencies
@@ -162,7 +163,13 @@ k3s_cluster:
       - "manifests/calico/tigera-operator.yaml"
       - "manifests/calico/custom-resources.yaml"
       - "manifests/nvidia/runtimeclass.yaml"
-      - "manifests/opagatekeeper/gatekeeper.yaml"
+    
+    # IP range to make available to metallb
+    k3s_metallb_addresses:
+      - 172.16.34.22/31
+      - 172.16.34.24/29
+      - 172.16.34.32/29
+      - 172.16.34.40/32
 
   hosts:
     k3s-app-ctrl1:
