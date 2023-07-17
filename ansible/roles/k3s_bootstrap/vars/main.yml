@@ -227,6 +227,11 @@ k3s_cleanup_paths:
   - "/run/secrets/kubernetes.io"
   - "/var/log/pods"
 
+k3s_deploy_opa: false
+k3s_deploy_argo: false
+k3s_deploy_nexus: false
+k3s_deploy_postop: false
+
 k3s_helm_install:
   metallb:
     install_name: 'metallb'
