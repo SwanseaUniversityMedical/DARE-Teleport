@@ -101,6 +101,15 @@ vars/main.yml
 | k3s_cleanup_paths | yes | see vars/main.yml | list of strings | List of paths that should be removed when k3s_state="uninstalled" |
 | helm_os | yes | 'linux' | string |  The OS of the Helm redistributable |
 | helm_redis_filename | yes | 'helm-v{{ helm_version }}-{{ helm_os }}-{{ helm_architecture }}.tar.gz' | string | File name of the Helm redistributable file |
+| k3s_deploy_opa | yes | false | true, false | Set to true to deploy Open Policy Agent on the newly created cluster |
+| k3s_deploy_argo | yes | false | true, false | Set to true to deploy ArgoCD on the newly created cluster |
+| k3s_deploy_nexus | yes | false | true, false | Set to true to deploy Sonatype Nexus Repo Manager on the newly created cluster |
+| k3s_deploy_postop | yes | false | true, false | Set to true to deploy Postgres Operator on the newly created cluster |
+
+k3s_deploy_opa: false
+k3s_deploy_argo: false
+k3s_deploy_nexus: false
+k3s_deploy_postop: false
 
 hostvars
 | **Variable** | **Required** | **Default** | **Choices/Type** | **Comments** |
