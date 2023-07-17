@@ -20,7 +20,7 @@ defaults/main.yml
 |helm_architecture  | yes          | 'amd64'  | string         | The CPU architecture of the Helm executable to install |
 |helm_mirror| yes | 'https://get.helm.sh' | string | Mirror to download Helm from |
 |helm_install_dir | yes | '/usr/local/share/helm' | string | Dir where Helm should be installed |
-|helm_download_dir | yes | "{{ x_ansible_download_dir | default(ansible_env.HOME + '/.ansible/tmp/downloads') }}" | string | Directory to store files downloaded for Helm |
+|helm_download_dir | yes | "{{ x_ansible_download_dir \| default(ansible_env.HOME + '/.ansible/tmp/downloads') }}" | string | Directory to store files downloaded for Helm |
 |proxy_env | yes | http_proxy: '', https_proxy: '' | dict | dict containing proxy environment variables if needed to download Helm binaries |
 
 
