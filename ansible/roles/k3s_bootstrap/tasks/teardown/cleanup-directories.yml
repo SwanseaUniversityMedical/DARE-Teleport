@@ -1,0 +1,62 @@
+---
+
+- name: clean up left over k3s directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ k3s_cleanup_paths }}"
+
+- name: find all kube directories
+  ansible.builtin.find:
+    paths: /var/lib/
+    file_type: any
+    recurse: yes
+    patterns:
+      - 'kube-.*'
+      - 'kube-*'
+    use_regex: true
+  register: var_lib_kube_files
+
+- name: clean up /var/lib/kube-*
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items:
+    - "{{ var_lib_kube_files.files }}"
+
+- name: unmount and remove data directories
+  block:
+    - name: warning msg
+      pause:
+        prompt: Please confirm you want to destroy all ceph and directpv data on all disks. If you are not sure - Ctrl+c and then "a" to abort.
+
+    - name: remove /var/lib/rook
+      ansible.builtin.file:
+        path: /var/lib/rook
+        state: absent
+
+    - name: find all directpv directories
+      ansible.builtin.find:
+        paths: /var/lib/directpv/
+        file_type: any
+        recurse: yes
+        patterns:
+          - '.*'
+        use_regex: true
+      register: directpv_directories
+
+    - name: unmount all directpv directories
+      ansible.posix.mount:
+        path: "{{ item.path }}"
+        state: unmounted
+      with_items:
+        - "{{ directpv_directories.files }}"
+
+    - name: remove all directpv directories
+      ansible.builtin.file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items:
+        - "{{ directpv_directories.files }}"
+  when: k3s_remove_data
+  become: true

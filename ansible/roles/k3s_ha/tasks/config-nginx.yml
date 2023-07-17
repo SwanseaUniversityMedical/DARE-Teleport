@@ -1,0 +1,25 @@
+---
+
+- name: configuring nginx
+  template:
+    src: "nginx.conf.j2"
+    dest: "{{ nginx_config_file }}"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  notify:
+    - restart nginx
+  when:
+    - k3s_control_node
+
+# Flush handlers
+- meta: flush_handlers
+  become: true
+
+- name: Ensure nginx is enabled
+  service:
+    name: "nginx"
+    enabled: true
+    state: restarted
+  when:
+    - k3s_control_node

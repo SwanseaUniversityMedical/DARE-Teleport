@@ -1,0 +1,12 @@
+---
+# tasks file for k3s_ha
+- name: Do not build the cluster yet, just set corosync
+  ansible.builtin.set_fact:
+    k3s_build_cluster: false
+
+- include_tasks: facts.yml
+
+- include_tasks: install.yml
+
+- include_tasks: config-corosync.yml
+- include_tasks: config-nginx.yml

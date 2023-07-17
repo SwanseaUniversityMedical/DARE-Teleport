@@ -1,0 +1,56 @@
+---
+- name: Installing Packages
+  apt:
+    name: "{{ item }}"
+    state: "present"
+  become: true
+  with_items:
+    - 'corosync'
+    - 'crmsh'
+    - 'pacemaker'
+    - 'pcs'
+    - 'nginx'
+  when:
+    - k3s_control_node
+  notify:
+    - stop corosync
+    - stop pacemaker
+    - stop nginx
+
+- name: check {{ corosync_authkey_file }} Exists
+  stat:
+    path: "{{ corosync_authkey_file }}"
+  register: "_corosync_authkey"
+
+- name: haveged On k3s_primary_control_node
+  apt:
+    name: "haveged"
+    state: "present"
+  become: true
+  when:
+    - not _corosync_authkey['stat']['exists']
+    - k3s_lead_control_node
+
+- name: Generating corosync authkey On {{ k3s_lead_control_node }}
+  command: corosync-keygen
+  become: true
+  register: "_corosync_auth_key_generated"
+  when:
+    - not _corosync_authkey['stat']['exists']
+    - k3s_lead_control_node
+
+- name: Uninstalling haveged On {{ k3s_primary_control_node }}
+  apt:
+    name: "haveged"
+    purge: true
+    state: "absent"
+  become: true
+  when:
+    - not _corosync_authkey['stat']['exists']
+    - k3s_lead_control_node
+
+- name: debian | Ensuring /etc/corosync/uidgid.d Folder Exists
+  file:
+    path: "/etc/corosync/uidgid.d"
+    state: "directory"
+

@@ -1,0 +1,209 @@
+---
+# tasks file for k3s_preflight
+
+- name: Remove 127.0.1.1 address from hosts (as we dont care when network is unavailable)
+  lineinfile:
+    path: /etc/hosts
+    state: absent
+    regexp: '^127.0.1.1'
+  tags: etc_hosts
+
+- name: Build hosts file
+  lineinfile:
+    dest: /etc/hosts
+    regexp: '.*{{ item }}$'
+    line: '{{ hostvars[item].ansible_default_ipv4.address }} {{item}}'
+    state: present
+  with_items: '{{ groups["all"] }}'
+  tags: etc_hosts
+
+- name: install necessary utils
+  become: true
+  package:
+    name:
+      - nmap
+      - net-tools
+      - vim-nox
+      - curl
+      - wget
+      - jq
+      - open-iscsi
+      - nfs-common
+      - lvm2
+      - chrony
+      - lldpd
+    state: present
+  when: ansible_pkg_mgr in ('apt', 'yum', 'dnf', 'zypper')
+  tags: packages
+
+- name: set max_user_instances
+  ansible.posix.sysctl:
+    name: fs.inotify.max_user_instances
+    value: '512'
+    state: present
+    sysctl_set: true
+
+- name: set vm.max_map_count
+  ansible.posix.sysctl:
+    name: vm.max_map_count
+    value: '262144'
+    state: present
+    sysctl_set: true
+
+- name: remove helm link
+  file:
+    path: /usr/local/bin/helm
+    state: absent
+  tags: helm
+
+- name: remove helm directory
+  file:
+    path: /usr/local/share/helm
+    state: absent
+  tags: helm
+
+- name: create download directory
+  file:
+    state: directory
+    mode: 'u=rwx,go=rx'
+    dest: '{{ helm_download_dir }}'
+  tags: helm
+
+- name: download sha256sum
+  get_url:
+    url: '{{ helm_mirror }}/{{ helm_redis_filename }}.sha256'
+    dest: '{{ helm_download_dir }}/{{ helm_redis_filename }}.sha256'
+    force: no
+    use_proxy: yes
+    validate_certs: yes
+    mode: 'u=rw,go=r'
+  tags: helm
+  environment: "{{ proxy_env }}"
+
+- name: read sha256sum
+  slurp:
+    src: '{{ helm_download_dir }}/{{ helm_redis_filename }}.sha256'
+  register: helm_sha256sum
+  tags: helm
+
+- name: download Helm
+  get_url:
+    url: '{{ helm_mirror }}/{{ helm_redis_filename }}'
+    dest: '{{ helm_download_dir }}/{{ helm_redis_filename }}'
+    sha256sum: '{{ helm_sha256sum.content | b64decode | trim }}'
+    force: no
+    use_proxy: yes
+    validate_certs: yes
+    mode: 'u=rw,go=r'
+  tags: helm
+  environment: "{{ proxy_env }}"
+
+- name: check current version
+  command: >
+    {{ helm_install_dir }}/helm version --client --template {{ "'{{ if .Version }}{{ .Version }}{{ else }}{{ .Client.SemVer }}{{ end }}'" }}
+  register: helm_current_version
+  failed_when: no
+  changed_when: no
+  tags: helm
+
+- name: current version
+  debug:
+    msg: '{{ helm_current_version.stdout }}'
+  when: helm_current_version.rc == 0
+  tags: helm
+
+- name: remove existing installation
+  become: true
+  file:
+    path: '{{ helm_install_dir }}'
+    state: absent
+  when:
+    - helm_current_version.rc == 0
+    - helm_current_version.stdout != ('v' + helm_version)
+  tags: helm
+
+- name: create the Helm installation dir
+  become: true
+  file:
+    state: directory
+    owner: root
+    group: root
+    mode: 'u=rwx,go=rx'
+    dest: '{{ helm_install_dir }}'
+  tags: helm
+
+- name: install unarchive module dependencies (apt, yum, dnf, zypper)
+  become: true
+  package:
+    name:
+      - tar
+      - unzip
+      - gzip
+    state: present
+  when: ansible_pkg_mgr in ('apt', 'yum', 'dnf', 'zypper')
+  tags: packages
+
+- name: install Helm
+  become: true
+  unarchive:
+    src: '{{ helm_download_dir }}/{{ helm_redis_filename }}'
+    remote_src: yes
+    dest: '{{ helm_install_dir }}'
+    extra_opts:
+      - '--strip-components=1'
+    owner: root
+    group: root
+    mode: 'o-w'
+    creates: '{{ helm_install_dir }}/helm'
+  tags: helm
+
+- name: create helm link
+  become: true
+  file:
+    path: '/usr/local/bin/helm'
+    state: absent
+  tags: helm
+
+- name: create helm link
+  become: true
+  file:
+    src: '{{ helm_install_dir }}/helm'
+    dest: '/usr/local/bin/helm'
+    state: link
+    owner: root
+    group: root
+    mode: 'u=rwx,go=rx'
+  tags: helm
+
+- name: copy chrony.conf
+  template:
+    src: "{{ role_path }}/templates/chrony.conf.j2"
+    dest: "/etc/chrony/chrony.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  tags: timesync
+
+- name: restart and enable chrony
+  service:
+    name: chrony
+    enabled: true
+    state: restarted
+  tags: timesync
+
+- name: sync time manually
+  shell: chronyc -a makestep
+  tags: timesync
+
+- name: Create timesync at system start
+  ansible.builtin.cron:
+    name: "timesync"
+    special_time: reboot
+    job: "/usr/bin/chronyc -a makestep"
+  tags: timesync 
+
+# Only run GPU tasks when a node is identified as a GPU node in the inventory
+- include_tasks: gpu.yml
+  when: gpu_node
+
+

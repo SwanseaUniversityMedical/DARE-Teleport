@@ -1,0 +1,51 @@
+---
+- name: Update apt repo and cache on all Debian/Ubuntu boxes
+  become: true
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600
+
+- name: Upgrade all packages on servers
+  become: true
+  apt: upgrade=dist force_apt_get=yes
+
+# Configure and install drivers for the GPU nodes
+- name: Install Ubuntu NVIDIA driver package
+  become: true
+  ansible.builtin.apt:
+    name: ubuntu-drivers-common
+    state: present
+
+- name: Autoinstall recommended NVIDIA drivers
+  become: true
+  ansible.builtin.command:
+    cmd: "ubuntu-drivers autoinstall"
+
+- name: Generate distribution details
+  become: true
+  shell: "echo $(. /etc/os-release;echo $ID$VERSION_ID)"
+  register: gpu_server_distro
+
+- name: Ensure distribution fact is set
+  ansible.builtin.set_fact:
+    gpu_server_distro: "{{ gpu_server_distro.stdout }}"
+
+- name: Ensure Livnidia apt-key is added
+  ansible.builtin.apt_key:
+    url: https://nvidia.github.io/libnvidia-container/gpgkey
+    state: present
+
+- name: Ensure Livnidia apt source is added
+  become: true
+  ansible.builtin.apt_repository: 
+    repo: "deb https://nvidia.github.io/libnvidia-container/stable/ubuntu18.04/$(ARCH) /"
+    state: present
+    filename: "libnvidia-container"
+    update_cache: yes
+
+- name: Ensure nvidia-container-toolkit is installed
+  become: true
+  ansible.builtin.apt:
+    name: nvidia-container-toolkit
+    state: present
+
+- name: Reboot system
+  ansible.builtin.reboot:

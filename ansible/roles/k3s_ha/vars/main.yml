@@ -1,0 +1,4 @@
+---
+# vars file for k3s_ha
+k3s_controller_list: []
+k3s_lead_controller_list: []

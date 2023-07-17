@@ -1,0 +1,10 @@
+---
+- name: Label GPU nodes
+  shell: "/usr/local/bin/kubectl label nodes {{ item }} --overwrite hiru.io/gpu=true"
+  loop: "{{ ansible_play_hosts }}"
+  loop_control:
+    extended: true
+  when: 
+    - k3s_lead_control_node
+    - " hostvars[item]['gpu_node'] "
+  ignore_errors: true
