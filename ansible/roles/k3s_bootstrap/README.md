@@ -106,10 +106,6 @@ vars/main.yml
 | k3s_deploy_nexus | yes | false | true, false | Set to true to deploy Sonatype Nexus Repo Manager on the newly created cluster |
 | k3s_deploy_postop | yes | false | true, false | Set to true to deploy Postgres Operator on the newly created cluster |
 
-k3s_deploy_opa: false
-k3s_deploy_argo: false
-k3s_deploy_nexus: false
-k3s_deploy_postop: false
 
 hostvars
 | **Variable** | **Required** | **Default** | **Choices/Type** | **Comments** |
