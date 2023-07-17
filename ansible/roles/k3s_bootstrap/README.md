@@ -77,13 +77,13 @@ vars/main.yml
 | k3s_release_channel | yes | stable | string | Always default to stable channel, this will change with k3s_release_version |
 | k3s_api_releases | yes | https://update.k3s.io/v1-release/channels | string | K3s updates API |
 | k3s_github_download_url | yes | "{{ k3s_github_url }}/releases/download" | string | Download location for releases |
-| k3s_runtime_config | yes | "{{ (k3s_server | default({})) | combine (k3s_agent | default({})) }}" | string | Generate a runtime config dictionary for validation |
+| k3s_runtime_config | yes | "{{ (k3s_server \| default({})) \| combine (k3s_agent \| default({})) }}" | string | Generate a runtime config dictionary for validation |
 | k3s_controller_list | yes | [] | please leave empty | Empty array for counting the number of control plane nodes |
 | k3s_control_plane_port | yes | 6443 | int | Control plane port default |
 | k3s_systemd_context | yes | system | string | Default to the "system" systemd context, this will be "user" when running rootless |
 | k3s_systemd_unit_dir | yes | "/etc/systemd/{{ k3s_systemd_context }}" | string | Directory for systemd unit files to be installed. As this role doesn't use package management, this should live in /etc/systemd, not /lib/systemd |
-| k3s_data_dir | yes | "{{ k3s_runtime_config['data-dir'] | default('/var/lib/rancher/k3s') }}" | string | Data directory location for k3s | 
-| k3s_config_dir | yes | "{{ k3s_config_file | dirname }}" | string | Config directory location for k3s |
+| k3s_data_dir | yes | "{{ k3s_runtime_config['data-dir'] \| default('/var/lib/rancher/k3s') }}" | string | Data directory location for k3s | 
+| k3s_config_dir | yes | "{{ k3s_config_file \| dirname }}" | string | Config directory location for k3s |
 | k3s_audit_dir | no | null | string | Directory for k8s audit config files to be installed |
 | k3s_token_location | yes | "{{ k3s_config_dir }}/cluster-token" | string | Directory for gathering the k3s token for clustering. |
 | k3s_server_manifests_dir | yes | "{{ k3s_data_dir }}/server/manifests" | string | Path for additional Kubernetes Manifests, see https://rancher.com/docs/k3s/latest/en/advanced/#auto-deploying-manifests | 
