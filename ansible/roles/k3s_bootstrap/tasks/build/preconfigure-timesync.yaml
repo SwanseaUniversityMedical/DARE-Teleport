@@ -1,0 +1,6 @@
+---
+
+- name: synchronize time on all nodes 
+  shell: chronyc -a makestep
+  when:
+    - k3s_build_cluster

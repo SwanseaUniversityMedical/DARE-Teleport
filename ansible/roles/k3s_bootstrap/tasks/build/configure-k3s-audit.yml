@@ -1,0 +1,20 @@
+---
+
+- name: Create audit folder
+  file:
+    path: "/var/lib/rancher/audit"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Enable auditing for k3s
+  copy:
+    src: "{{ item }}.j2"
+    dest: "/var/lib/rancher/audit/{{ item }}"
+    mode: 0400
+    owner: root
+    group: root
+  with_items:
+    - audit-policy.yml
+    - webhook-config.yml

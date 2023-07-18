@@ -1,0 +1,11 @@
+---
+# defaults file for k3s_ha
+
+corosync_authkey_file: '/etc/corosync/authkey'
+
+# Defines interface used for cluster
+corosync_bindnet_interface: 'vlan361'
+
+corosync_config_file: '/etc/corosync/corosync.conf'
+nginx_config_file: '/etc/nginx/nginx.conf'
+

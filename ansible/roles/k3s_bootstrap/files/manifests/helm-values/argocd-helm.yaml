@@ -1,0 +1,11 @@
+createAggregateRoles: true
+
+configs:
+  params:
+    server:
+      insecure: true
+  cm:
+    admin:
+      enabled: true
+    kustomize:
+      buildOptions: --enable-helm

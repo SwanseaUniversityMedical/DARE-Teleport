@@ -1,0 +1,122 @@
+---
+
+- name: Setting Facts
+  set_fact:
+    corosync_bindnet_addr: "{{ hostvars[inventory_hostname]['ansible_' + corosync_bindnet_interface]['ipv4']['address'] }}"
+
+- name: create directory for pcmk
+  file:
+    path: "/etc/corosync/service.d"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+  when:
+    - k3s_control_node
+    
+- name: copy pcmk config
+  copy:
+    src: "{{ role_path }}/files/corosync/service.d/pcmk"
+    dest: "/etc/corosync/service.d/pcmk"
+    owner: "root"
+    group: "root"
+    mode: "0640"
+  when:
+    - k3s_control_node
+
+- name: Grab corosync Auth Key
+  slurp:
+    src: "{{ corosync_authkey_file }}"
+  become: true
+  register: "_corosync_authkey_raw_"
+  changed_when: false
+  when: 
+    - k3s_lead_control_node
+
+- name: Setting Fact For Corosync Auth Key On Non Masters
+  set_fact:
+    _corosync_authkey_: "{{ hostvars[k3s_control_delegate]['_corosync_authkey_raw_']['content'] }}"
+
+- name: Configuring Corosync Auth Key On Non Masters
+  template:
+    src: "authkey.j2"
+    dest: "{{ corosync_authkey_file }}"
+    owner: "root"
+    group: "root"
+    mode: "u=r,g=,o="
+  become: true
+  when:
+    - k3s_control_node
+    - not k3s_lead_control_node
+
+- name: configuring corosync
+  template:
+    src: "corosync.conf.j2"
+    dest: "{{ corosync_config_file }}"
+    owner: "root"
+    group: "root"
+    mode: "u=rw,g=r,o=r"
+  notify:
+    - restart corosync
+    - restart pacemaker
+    - restart pcsd
+  register: "_corosync_reconfigured"
+  when:
+    - k3s_control_node
+
+# Flush handlers
+- meta: flush_handlers
+  become: true
+
+- name: config | Ensuring Service Are Enabled
+  service:
+    name: "{{ item }}"
+    enabled: true
+  with_items:
+    - 'pacemaker'
+    - 'pcsd'
+  when:
+    - k3s_control_node
+
+- name: config | Ensuring pcsd Service Is Started
+  service:
+    name: 'pcsd'
+    state: "started"
+  become: true
+  when:
+    - k3s_control_node
+
+- name: config | Ensuring pacemaker Service Is Started
+  service:
+    name: 'pacemaker'
+    state: "started"
+  when:
+    - k3s_control_node
+
+# corosync rules
+
+- name: disable ShutTheOtherNodeInTheHead service 
+  shell: crm configure property stonith-enabled=false
+  ignore_errors: true
+  when: 
+    - k3s_lead_control_node
+
+- name: Carry on even if there is no quorum 
+  shell: crm configure property no-quorum-policy=ignore
+  ignore_errors: true
+  when: 
+    - k3s_lead_control_node
+
+- name: add virtual ip address
+  shell: crm configure primitive virtual_ip ocf:heartbeat:IPaddr2 params ip='{{ k3s_vip }}' nic={{ corosync_bindnet_interface }} cidr_netmask='32' op monitor interval='5s' meta migration-threshold='10'
+  ignore_errors: true
+  when: 
+    - k3s_lead_control_node
+
+- name: Ensure that virtual_ip is started
+  shell: crm resource start virtual_ip
+  ignore_errors: true
+  when: 
+    - k3s_lead_control_node
+
+
