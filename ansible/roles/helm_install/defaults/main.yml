@@ -1,0 +1,100 @@
+---
+# defaults file for helm_install
+# The OS of the Helm redistributable
+helm_os: 'linux'
+
+# File name of the Helm redistributable file
+helm_redis_filename: 'helm-v{{ helm_version }}-{{ helm_os }}-{{ helm_architecture }}.tar.gz'
+
+# Helm version number
+helm_version: '3.12.2'
+
+# The CPU architecture of the Helm executable to install
+helm_architecture: 'amd64'
+
+# Mirror to download Helm from
+helm_mirror: 'https://get.helm.sh'
+
+# Dir where Helm should be installed
+helm_install_dir: '/usr/local/share/helm'
+
+# Directory to store files downloaded for Helm
+helm_download_dir: "{{ x_ansible_download_dir | default(ansible_env.HOME + '/.ansible/tmp/downloads') }}"
+
+proxy_env: 
+  http_proxy: ''
+  https_proxy: ''
+
+# Really don't recommend changing these values unless you know what you're doing
+# or you're trying to install to a minikube-type environment
+k3s_deploy_rookceph: true
+k3s_deploy_metallb: true
+
+# These should be changed depending on what cluster you're targeting with the ansible
+k3s_deploy_opa: false
+k3s_deploy_argo: false
+k3s_deploy_postop: false
+k3s_deploy_nexus: false
+k3s_deploy_minioop: false
+
+helm_values_dir: "helm"
+
+k3s_become_for_all: true
+k3s_become_for_directory_creation: false
+
+k3s_metallb_addresses: []
+
+k3s_server_environment:
+  - key: KUBECONFIG
+    value: '/etc/rancher/k3s/k3s.yaml'
+
+k3s_helm_install:
+  metallb:
+    install_name: 'metallb'
+    install_namespace: 'networking'
+    chart_name: 'metallb'
+    chart_version: '4.4.2'
+    repo_address: 'https://charts.bitnami.com/bitnami'
+    install_values: ''
+  argocd:
+    install_name: 'argocd'
+    install_namespace: 'argocd'
+    chart_name: 'argo-cd'
+    chart_version: '5.39.0'
+    repo_address: 'https://argoproj.github.io/argo-helm'
+    install_values: 'argocd-helm.yaml'
+  nexus:
+    install_name: 'nexus'
+    install_namespace: 'nexus'
+    chart_name: 'nexus-repository-manager'
+    chart_version: '57.0.0'
+    repo_address: 'https://sonatype.github.io/helm3-charts/'
+    install_values: 'nexus-helm.yaml'
+  opagatekeeper:
+    install_name: 'gatekeeper'
+    install_namespace: 'gatekeeper-system'
+    chart_name: 'gatekeeper'
+    chart_version: 'v3.12.0'
+    repo_address: 'https://open-policy-agent.github.io/gatekeeper/charts'
+    install_values: 'opagatekeeper-helm.yaml'
+  rook_ceph_cluster:
+    install_name: 'rook-ceph-cluster'
+    install_namespace: 'rook-ceph'
+    chart_name: 'rook-ceph-cluster'
+    chart_version: 'v1.11.4'
+    repo_address: 'https://charts.rook.io/release'
+    install_values: 'rook-ceph-cluster.yaml'
+  rook_ceph_operator:
+    install_name: 'rook-ceph'
+    install_namespace: 'rook-ceph'
+    chart_name: 'rook-ceph'
+    chart_version: 'v1.11.4'
+    repo_address: 'https://charts.rook.io/release'
+    install_values: 'rook-ceph-operator.yaml'
+  postgres_operator:
+    install_name: 'postgres-operator'
+    install_namespace: 'postgres-operator'
+    chart_name: 'postgres-operator'
+    chart_version: '1.10.0'
+    repo_address: 'https://opensource.zalando.com/postgres-operator/charts/postgres-operator'
+    install_values: 'postgres-operator.yaml'

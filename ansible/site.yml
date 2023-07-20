@@ -1,0 +1,8 @@
+# Provision the cluster
+- name: K3s Deployment
+  become: yes
+  gather_facts: True
+  hosts: micro_cluster
+  max_fail_percentage: 0
+  roles:
+    - role: helm_install

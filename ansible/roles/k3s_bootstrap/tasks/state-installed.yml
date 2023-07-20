@@ -80,7 +80,3 @@
     minutes: 5
 
 - import_tasks: build/apply-node-labels.yml
-
-- import_tasks: build/postinstall-install-via-helm.yml
-  when:
-    - k3s_lead_control_node
