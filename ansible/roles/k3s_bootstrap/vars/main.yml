@@ -226,3 +226,4 @@ k3s_cleanup_paths:
   - "/etc/rancher"
   - "/run/secrets/kubernetes.io"
   - "/var/log/pods"
+
