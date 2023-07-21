@@ -1,0 +1,14 @@
+namespace: "dare"
+name: "common"
+description: "Common Ansible Roles used by multiple deployments of DARE-Teleport."
+version: "1.0.0"
+readme: "README.md"
+authors:
+  - "Alex Lee"
+  - "Joss Whittle"
+license:
+  - "MIT"
+tags:
+  - dare
+  - collection
+repository: "https://github.com/SwanseaUniversityMedical/DARE-Teleport"
