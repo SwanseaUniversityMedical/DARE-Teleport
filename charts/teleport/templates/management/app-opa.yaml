@@ -11,7 +11,7 @@ metadata:
 spec:
   destination:
     namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appOpa.namespace }}"
-    server: {{ .Values.global.management.address }}
+    server: {{ eq .Values.appOpa.cluster "" | ternary .Values.global.management.address .Values.appOpa.cluster }}
   project: {{ .Values.global.management.argocd.project }}
   syncPolicy:
     automated:
