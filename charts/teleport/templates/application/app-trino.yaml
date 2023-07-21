@@ -11,7 +11,7 @@ metadata:
 spec:
   destination:
     namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appTrino.namespace }}"
-    server: {{ eq .Values.appTrino.cluster_override "" | ternary .Values.global.application.address .Values.appTrino.cluster_override }}
+    server: {{ eq .Values.appTrino.cluster "" | ternary .Values.global.application.address .Values.appTrino.cluster }}
   project: {{ .Values.global.application.argocd.project }}
   syncPolicy:
     automated:

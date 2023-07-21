@@ -11,7 +11,7 @@ metadata:
 spec:
   destination:
     namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appPromStack.namespace }}"
-    server: {{ eq .Values.appPromStack.cluster_override "" | ternary .Values.global.monitoring.address .Values.appPromStack.cluster_override }}
+    server: {{ eq .Values.appPromStack.cluster "" | ternary .Values.global.monitoring.address .Values.appPromStack.cluster }}
   project: {{ .Values.global.monitoring.argocd.project }}
   syncPolicy:
     automated:

@@ -19,7 +19,7 @@ global:
 
 appGuacamole:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: guacamole
   source:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
@@ -29,7 +29,7 @@ appGuacamole:
 
 appJupyter:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: jupyter
   source:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
@@ -39,7 +39,7 @@ appJupyter:
 
 appTrino:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: trino
   source:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
@@ -49,7 +49,7 @@ appTrino:
 
 appHive:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: hive
   source:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
@@ -59,7 +59,7 @@ appHive:
 
 appVault:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: vault
   source:
     repoURL: https://helm.releases.hashicorp.com
@@ -69,7 +69,7 @@ appVault:
 
 appOpa:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: opa
   source:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
@@ -79,7 +79,7 @@ appOpa:
 
 appControl:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: control
   source:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
@@ -89,7 +89,7 @@ appControl:
 
 appPromStack:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: monitoring
   source:
     repoURL: https://prometheus-community.github.io/helm-charts
@@ -99,7 +99,7 @@ appPromStack:
 
 appLoki:
   enabled: true
-  cluster_override: ""
+  cluster: ""
   namespace: monitoring
   source:
     repoURL: https://grafana.github.io/helm-charts

@@ -11,7 +11,7 @@ metadata:
 spec:
   destination:
     namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appLoki.namespace }}"
-    server: {{ eq .Values.appLoki.cluster_override "" | ternary .Values.global.monitoring.address .Values.appLoki.cluster_override }}
+    server: {{ eq .Values.appLoki.cluster "" | ternary .Values.global.monitoring.address .Values.appLoki.cluster }}
   project: {{ .Values.global.monitoring.argocd.project }}
   syncPolicy:
     automated:
