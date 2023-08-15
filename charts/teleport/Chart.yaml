@@ -1,6 +1,6 @@
 apiVersion: v2
-appVersion: 1.0.7
+appVersion: 1.1.0
 description: Helm chart for deploying DARE Teleport
 name: teleport
 type: application
-version: 1.0.7
+version: 1.1.0

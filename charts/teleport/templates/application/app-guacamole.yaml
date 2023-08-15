@@ -11,7 +11,7 @@ metadata:
 spec:
   destination:
     namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appGuacamole.namespace }}"
-    server: {{ .Values.global.application.address }}
+    server: {{ eq .Values.appGuacamole.cluster "" | ternary .Values.global.application.address .Values.appGuacamole.cluster }}
   project: {{ .Values.global.application.argocd.project }}
   syncPolicy:
     automated:
