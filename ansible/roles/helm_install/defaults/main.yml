@@ -104,6 +104,7 @@ k3s_helm_install:
 
 nexus_docker_proxy_port: 8081
 nexus_docker_group_port: 8082
+nexus_docker_hosted_port: 5000
 
 nexus_config:
   proxies:
@@ -192,7 +193,7 @@ nexus_config:
   hosted:
     docker:
       - name: docker-hosted
-        http_port: "{{ nexus_docker_proxy_port }}"
+        http_port: "{{ nexus_docker_hosted_port }}"
         v1_enabled: true
 
     helm:

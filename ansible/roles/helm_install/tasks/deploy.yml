@@ -16,6 +16,22 @@
   when:
     - k3s_deploy_rookceph
 
+# rook ceph cluster
+- name: deploy rook-ceph cluster helm chart
+  kubernetes.core.helm:
+    chart_ref: "{{ k3s_helm_install.rook_ceph_cluster.chart_name }}"
+    chart_repo_url: "{{ k3s_helm_install.rook_ceph_cluster.repo_address }}"
+    chart_version: "{{ k3s_helm_install.rook_ceph_cluster.chart_version }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig_dir }}"
+    release_name: "{{ k3s_helm_install.rook_ceph_cluster.install_name }}"
+    release_namespace: "{{ k3s_helm_install.rook_ceph_cluster.install_namespace }}"
+    values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.rook_ceph_cluster.install_values }}"
+    wait: true
+  environment: "{{ proxy_env }}"
+  when:
+    - k3s_deploy_rookceph
+
 # metallb
 - name: deploy metallb helm chart
   kubernetes.core.helm:

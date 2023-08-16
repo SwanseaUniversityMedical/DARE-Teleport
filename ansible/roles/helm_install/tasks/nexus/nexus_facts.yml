@@ -4,6 +4,7 @@
   kubernetes.core.k8s_info:
     api_version: v1
     kind: Service
+    name: "{{ k3s_helm_install.nexus.install_name }}-nexus-repository-manager"
     namespace: "{{ k3s_helm_install.nexus.install_namespace }}"
     label_selectors:
       - "app.kubernetes.io/instance={{ k3s_helm_install.nexus.install_name }}"
@@ -25,6 +26,10 @@
     nexus_ip: "{{ nexus_service.resources[0].status.loadBalancer.ingress[0].ip }}"
     nexus_pod_name: "{{ nexus_pod.resources[0].metadata.name }}"
 
+- name: get service info of the deployed nexus instance
+  shell: "kubectl get services  -n nexus | grep docker | awk '{print $4}'"
+  register: nexus_docker_service
+
 - name: get the nexus admin password
   shell: "kubectl exec -it {{ nexus_pod_name }} -n {{ k3s_helm_install.nexus.install_namespace }} -- cat /nexus-data/admin.password"
   register: nexus_admin_password_out
@@ -36,7 +41,7 @@
     nexus_api_port: 8081
     nexus_api_validate_certs: false
     nexus_api_context_path: "/"
-    nexus_api_timeout: 60
+    nexus_api_timeout: 120
     nexus_anonymous_access: true
     nexus_rest_api_endpoint: "service/rest/v1/script"
     nexus_repos_conda_proxy: "{{ nexus_config.proxies.conda }}"
@@ -44,6 +49,8 @@
     nexus_repos_pypi_proxy: "{{ nexus_config.proxies.pypi }}"
     nexus_repos_r_proxy: "{{ nexus_config.proxies.cran }}"
     nexus_repos_docker_group: "{{ nexus_config.repo_groups.docker }}"
+    nexus_docker_hostname: "{{ nexus_docker_service.stdout }}"
 
 - set_fact:
     api_url: "{{ nexus_api_scheme }}://{{ nexus_api_hostname }}:{{ nexus_api_port }}"
+    docker_url: "{{ nexus_docker_hostname }}:{{ nexus_docker_hosted_port }}"

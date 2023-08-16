@@ -1,0 +1,77 @@
+---
+
+- debug:
+    msg: "{{ item }}"
+
+- set_fact:
+    source_info: "{{ item.value.source }}"
+
+- name: download helm chart
+  kubernetes.core.helm_pull:
+    chart_ref: "{{ source_info.chart }}"
+    chart_version: "{{ source_info.targetRevision }}"
+    repo_url: "{{ source_info.repoURL }}"
+    destination: "{{ temp_helm_chart_dir.path }}"
+    username: "{{ harbor_dare_user }}"
+    password: "{{ harbor_dare_pass }}"
+  register: helm_pull_res
+  when: source_info.repoURL | regex_search('^https:\\/\\/harbor\\.ukserp\\.ac\\.uk') 
+
+- name: download helm chart
+  kubernetes.core.helm_pull:
+    chart_ref: "{{ source_info.chart }}"
+    chart_version: "{{ source_info.targetRevision }}"
+    repo_url: "{{ source_info.repoURL }}"
+    destination: "{{ temp_helm_chart_dir.path }}"
+  register: helm_pull_res
+  when: 
+    - not ( source_info.repoURL | regex_search('^https:\\/\\/harbor\\.ukserp\\.ac\\.uk') ) 
+    - not ( source_info.repoURL | regex_search('^oci:\\/\\/') )
+
+- name: download helm chart
+  kubernetes.core.helm_pull:
+    chart_ref: "{{ source_info.repoURL }}/{{ source_info.chart }}"
+    chart_version: "{{ source_info.targetRevision }}"
+    destination: "{{ temp_helm_chart_dir.path }}"
+  register: helm_pull_res
+  when: 
+    - source_info.repoURL | regex_search('^oci:\\/\\/') 
+
+
+- name: find the actual chart version if a constraint pattern was specified
+  block:
+    - name: find the actual downloaded chart file name
+      find:
+        paths: "{{ temp_helm_chart_dir.path }}"
+        patterns: "(^{{ source_info.chart }}-(\\d|\\.)*tgz$)"
+        use_regex: true
+      register: found_file
+
+    - set_fact:
+        source_info:
+          targetRevision: "{{ found_file.files[0].path | regex_search('(\\d|\\.)*(?=.tgz$)') }}"
+          chart: "{{ source_info.chart }}"
+          repoURL: "{{ source_info.repoURL }}"
+  when: source_info.targetRevision | regex_search('\*|\^|\~|x')
+
+- name: upload to nexus
+  vars:
+    resource_path: "{{ nexus_api_context_path }}service/rest/v1/components"
+    repository: "helm-hosted"
+    filename: "@{{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz"
+  command: >
+    curl -s -u admin:{{ nexus_admin_password }} -X POST 
+    '{{ api_url }}{{ resource_path }}?repository={{ repository }}' 
+    -F helm.asset={{ filename }}
+
+- name: get chart dependencies
+  command: >
+    helm dependency list {{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz
+  register: chart_deps
+
+- name: for each chart dep, process
+  include_tasks: handle_helm_dependencies.yml
+  loop: "{{ chart_deps.stdout_lines | reject('search', 'STATUS') | reject('search', 'WARNING') | list }}"
+  loop_control:
+    loop_var: dep_item
+

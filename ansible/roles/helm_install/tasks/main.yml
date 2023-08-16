@@ -3,22 +3,20 @@
 - import_tasks: facts.yml
   when: k3s_lead_control_node
 
-# - import_tasks: deploy.yml
-#   when: k3s_lead_control_node
+- import_tasks: deploy.yml
+  when: k3s_lead_control_node
 
-- import_tasks: nexus_facts.yml
+- import_tasks: nexus/nexus_facts.yml
 
-# - import_tasks: configure_nexus.yml
-#   when: 
-#     - k3s_lead_control_node
-#     - k3s_deploy_nexus
+- import_tasks: nexus/configure_nexus.yml
+  when: 
+    - k3s_lead_control_node
+    - k3s_deploy_nexus
 
-# - import_tasks: populate_nexus.yml
-#   when: 
-#     - k3s_lead_control_node
-#     - k3s_deploy_nexus
-
-- import_tasks: populate_nexus.yml
+- import_tasks: nexus/populate_nexus.yml
+  when: 
+    - k3s_lead_control_node
+    - k3s_deploy_nexus
 
 
 # THIS ASSUMES THAT YOUR MICROK8S IS WORKING, AND THAT YOU'VE DONE

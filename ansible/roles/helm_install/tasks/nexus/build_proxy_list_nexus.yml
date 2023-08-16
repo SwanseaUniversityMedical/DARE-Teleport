@@ -1,4 +1,5 @@
 ---
+
 # Process a single _nexus_repos_global_list for configured formats and apply default values for type.
 - name: Process definitions for docker
   block:

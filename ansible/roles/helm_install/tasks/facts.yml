@@ -67,6 +67,18 @@
     update_cache: yes
   become: true
 
+- name: ensure yq is installed
+  community.general.snap:
+    name: yq
+    state: present
+  become: true
+
+- name: ensure docker is installed
+  community.general.snap:
+    name: docker
+    state: present
+  become: true
+
 - name: ensure kubectl is installed
   shell: which kubectl
   register: where_kubectl_raw
@@ -90,6 +102,6 @@
   import_tasks: install_helm.yml
   when: helm_not_installed
 
-# - name: if krew isn't installed, install it
-#   import_tasks: install_krew.yml
-#   when: krew_not_installed
+- name: if krew isn't installed, install it
+  import_tasks: install_krew.yml
+  when: krew_not_installed

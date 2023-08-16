@@ -1,4 +1,5 @@
 ---
+
 - name: Declaring Groovy script for {{ item }}
   ansible.builtin.uri:
     url: "{{ api_url }}{{ nexus_api_context_path }}{{ nexus_rest_api_endpoint }}"

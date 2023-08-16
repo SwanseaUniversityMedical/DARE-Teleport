@@ -1,0 +1,17 @@
+---
+
+- set_fact:
+    dep_lines: "{{ dep_item | split('\t') }}"
+    dep_item_new: {}
+
+- set_fact:
+    dep_item_new:
+      value:
+        source:
+          chart: "{{ dep_lines[0] | trim }}"
+          targetRevision: "{{ dep_lines[1] | trim }}"
+          repoURL: "{{ dep_lines[2] | trim }}"
+
+- include_tasks: populate_nexus_helm.yml
+  vars:
+    item: "{{ dep_item_new }}"
