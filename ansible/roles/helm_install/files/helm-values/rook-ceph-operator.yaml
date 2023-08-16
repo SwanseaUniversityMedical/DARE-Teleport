@@ -1,6 +1,6 @@
 csi:
-  cephFSFSGroupPolicy: None
-  rbdFSGroupPolicy: ReadWriteOnceWithFSType
+  cephFSFSGroupPolicy: File
+  rbdFSGroupPolicy: File
 
 discoverDaemonUdev: null
 

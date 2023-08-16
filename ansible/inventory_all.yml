@@ -1,16 +1,19 @@
 micro_cluster:
   vars:
     k3s_deploy_rookceph: false
-    k3s_deploy_metallb: false
-    k3s_deploy_opa: true
-    k3s_deploy_argo: true
-    k3s_deploy_postop: true
+    k3s_deploy_metallb: true
+    k3s_deploy_opa: false
+    k3s_deploy_argo: false
+    k3s_deploy_postop: false
     k3s_deploy_nexus: true
-    k3s_deploy_minioop: true
+    k3s_deploy_minioop: false
 
     k3s_server_environment:
     - key: KUBECONFIG
       value: '/root/.kube/config'
+
+    k3s_metallb_addresses: 
+      - 10.0.0.0/24
 
   hosts:
     single_instance:

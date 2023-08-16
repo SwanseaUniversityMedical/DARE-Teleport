@@ -1,0 +1,56 @@
+---
+# for each source
+- set_fact:
+    source_info: "{{ app_helm_sources[item].source }}"
+# download
+
+# - name: download helm chart
+#   kubernetes.core.helm_pull:
+#     chart_ref: "{{ source_info.chart }}"
+#     chart_version: "{{ source_info.targetRevision }}"
+#     repo_url: "{{ source_info.repoURL }}"
+#     destination: "{{ temp_helm_chart_dir.path }}"
+#     username: "robot$dare-alex-ansible-test"
+#     password: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MjM2NDYyODAsImlhdCI6MTY5MjExMDI4MCwiaXNzIjoiaGFyYm9yLXRva2VuLWRlZmF1bHRJc3N1ZXIiLCJpZCI6MTExNzU5LCJwaWQiOjY4LCJhY2Nlc3MiOlt7IlJlc291cmNlIjoiL3Byb2plY3QvNjgvcmVwb3NpdG9yeSIsIkFjdGlvbiI6InB1bGwiLCJFZmZlY3QiOiIifSx7IlJlc291cmNlIjoiL3Byb2plY3QvNjgvaGVsbS1jaGFydCIsIkFjdGlvbiI6InJlYWQiLCJFZmZlY3QiOiIifV19.XZWFCfqzeRf2olwqcA03FUKxpG1eGC_KzWLDmuxnK0ILFiHyketzij17wacqX80RgsG5CKrMsuDM0s4kmHqsrNZzRlxtjQ6jbtDz4DH5NRN4-vFnn4CxTJ6KtBljmJ0bNMmNh5dYBPNV2V86DzzgNe5FjY0TJauBsEcpCJMqyt5tx3gZ4ZoMyhokRsPtiI38za2DtXrd1hEMvomMrMSjLQDipFWpvWOM__QOKp5cPv0XcRv9iIN3vlrHTdhOxNRWZj4SfC2bCSpzWMhePvV2oAYLj2qCMTg7MN8OG3U9mGLxPDyR2KbZZaWboeS-lS3RN4_zBKYLghX2jKCW_4Nv2bw_Yb_3kqYSUnDpnck2Yu0aw9Jq8bOsESE6AX3l1AWXZGgVX5kuTXvcbeqUrbBIW1quEh52va6Av4ewmgNHG06zOBxQXmd4XOu24UfQVYlP5X9e3zyg-NptwchjVqaAmHIzP4Uwgq1q0zT7V4XlRoCf1E_O9_vuAnDkIBhNHrwOZreOt-U0iUB932cH2mKeJOIKYbokkJCy5D2Qfs8bVxjoUPoj2S2825VCNoFMHjHsnYm8muy2_4Y385A5hu-hbgoN4MZVU1nP0Cjvk64t7pcZCeHI_n7SXBvDZwJ7cGJF25CYEXBqy33rij6QslAr7Io4grpJ-vM95_fLkRm2CMs"
+#   register: dlhelm_res
+
+
+- set_fact:
+    tmp_bug: 
+      helm.asset: "{{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz"
+
+- debug:
+    msg: "{{ tmp_bug | to_json }}"
+
+- name: upload to nexus 
+  vars:
+    resource_path: "{{ nexus_api_context_path }}service/rest/v1/components"
+    repository: "helm-hosted"
+    args:
+      helm_asset: "{{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz"
+  shell: "curl -u admin:{{ nexus_admin_password }} -X POST '{{ api_url }}{{ resource_path }}?repository={{ repository }}' -F helm.asset=@{{ args.helm_asset }}"
+
+
+
+# - name: upload to nexus
+#   vars:
+#     resource_path: "{{ nexus_api_context_path }}service/rest/v1/components"
+#     repository: "helm-hosted"
+#     args:
+#       helm:
+#         asset: "{{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz"
+#   ansible.builtin.uri:
+#     url: "{{ api_url }}{{ resource_path }}?repository={{ repository }}"
+#     timeout: "{{ nexus_api_timeout | int }}"
+#     user: admin
+#     password: "{{ nexus_admin_password }}"
+#     headers:
+#       accept: application/json
+#     status_code: [204]
+#     method: POST
+#     force_basic_auth: true
+#     validate_certs: "{{ nexus_api_validate_certs }}"
+#     body: "{{ args | to_json }}"
+#     body_format: "form-multipart"
+#     follow_redirects: "all"
+#     remote_src: yes

@@ -3,7 +3,7 @@
 # rook ceph operator
 - name: deploy rook-ceph operator helm chart
   kubernetes.core.helm:
-    name: "{{ k3s_helm_install.rook_ceph_operator.chart_name }}"
+    chart_ref: "{{ k3s_helm_install.rook_ceph_operator.chart_name }}"
     chart_repo_url: "{{ k3s_helm_install.rook_ceph_operator.repo_address }}"
     chart_version: "{{ k3s_helm_install.rook_ceph_operator.chart_version }}"
     create_namespace: true
@@ -11,6 +11,7 @@
     release_name: "{{ k3s_helm_install.rook_ceph_operator.install_name }}"
     release_namespace: "{{ k3s_helm_install.rook_ceph_operator.install_namespace }}"
     values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.rook_ceph_operator.install_values }}"
+    wait: true
   environment: "{{ proxy_env }}"
   when:
     - k3s_deploy_rookceph
@@ -18,13 +19,14 @@
 # metallb
 - name: deploy metallb helm chart
   kubernetes.core.helm:
-    name: "{{ k3s_helm_install.metallb.chart_name }}"
+    chart_ref: "{{ k3s_helm_install.metallb.chart_name }}"
     chart_repo_url: "{{ k3s_helm_install.metallb.repo_address }}"
     chart_version: "{{ k3s_helm_install.metallb.chart_version }}"
     create_namespace: true
     kubeconfig: "{{ kubeconfig_dir }}"
     release_name: "{{ k3s_helm_install.metallb.install_name }}"
     release_namespace: "{{ k3s_helm_install.metallb.install_namespace }}"
+    wait: true
   environment: "{{ proxy_env }}"
   when:
     - k3s_deploy_metallb
@@ -33,7 +35,7 @@
 - name: add metallb config
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('file', '{{ helm_values_dir }}/metallb-config.yaml') | from_yaml }}"
+    src: "~/{{ helm_values_dir }}/metallb-config.yaml"
   when:
     - k3s_deploy_metallb
 
@@ -48,6 +50,7 @@
     release_name: "{{ k3s_helm_install.opagatekeeper.install_name }}"
     release_namespace: "{{ k3s_helm_install.opagatekeeper.install_namespace }}"
     values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.opagatekeeper.install_values }}"
+    wait: true
   environment: "{{ proxy_env }}"
   when:
     - k3s_deploy_opa
@@ -63,6 +66,7 @@
     release_name: "{{ k3s_helm_install.argocd.install_name }}"
     release_namespace: "{{ k3s_helm_install.argocd.install_namespace }}"
     values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.argocd.install_values }}"
+    wait: true
   environment: "{{ proxy_env }}"
   when:
     - k3s_deploy_argo
@@ -77,6 +81,7 @@
     kubeconfig: "{{ kubeconfig_dir }}"
     release_name: "{{ k3s_helm_install.postgres_operator.install_name }}"
     release_namespace: "{{ k3s_helm_install.postgres_operator.install_namespace }}"
+    wait: true
   environment: "{{ proxy_env }}"
   when:
     - k3s_deploy_postop
@@ -92,6 +97,7 @@
     release_name: "{{ k3s_helm_install.nexus.install_name }}"
     release_namespace: "{{ k3s_helm_install.nexus.install_namespace }}"
     values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.nexus.install_values }}"
+    wait: true
   environment: "{{ proxy_env }}"
   when:
     - k3s_deploy_nexus
