@@ -1,0 +1,31 @@
+{{- if .Values.appKeycloak.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-keycloak
+  namespace: {{ .Values.global.application.argocd.namespace }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appKeycloak.namespace }}"
+    server: {{ eq .Values.appKeycloak.cluster "" | ternary .Values.global.application.address .Values.appKeycloak.cluster }}
+  project: {{ .Values.global.application.argocd.project }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:  
+    - CreateNamespace=true
+  source:
+    {{- .Values.appKeycloak.source | toYaml | nindent 4 }}
+    helm:
+      valueFiles:
+        - values.yaml
+      {{- if .Values.appKeycloak.values }}
+      values: |
+        {{- .Values.appKeycloak.values | toYaml | nindent 8 }}
+      {{- end }}
+{{- end }}
