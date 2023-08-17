@@ -1,0 +1,34 @@
+---
+
+- set_fact:
+    file_location: "{{ item.path }}"
+    chart_folder: "{{ temp_helm_chart_dir.path }}"
+
+- name: unpack the chart
+  ansible.builtin.unarchive:
+    src: "{{ file_location }}"
+    dest: "{{ chart_folder }}"
+    remote_src: yes
+  register: unpacked_location
+
+- set_fact:
+    target_folder_full: "{{ unpack_loc[-1] }}"
+  vars: 
+    unpack_loc: "{{ unpacked_location.src | split('/') }}"
+
+- set_fact:
+    target_folder: "{{ target_flines[0] }}"
+  vars: 
+    target_flines: "{{ target_folder_full | split('-') }}"
+
+- name: use helm to derive all of the container images the chart uses
+  shell: >
+    helm template {{ chart_folder }}/{{ target_folder }} | yq e '..|.image? | select(.)' - | sort
+  register: derived_images
+
+- set_fact:
+    derived_images: "{{ derived_images.stdout_lines | reject('search', '---') | list }}"
+
+- name: push up to nexus
+  include_tasks: docker_pull_push.yml
+  loop: "{{ derived_images }}"

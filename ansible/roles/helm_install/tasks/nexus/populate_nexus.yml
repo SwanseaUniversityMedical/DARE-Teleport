@@ -1,0 +1,57 @@
+---
+
+- set_fact:
+    app_helm_sources: "{{ lookup('file', '{{ teleport_chart_directory }}/values.yaml') | from_yaml | combine({ 'global': omit })}}"
+
+- name: get all helm charts, and upload them to nexus
+  include_tasks: populate_nexus_helm.yml
+  loop: "{{ app_helm_sources | dict2items }}"
+
+- name: find all of the helm charts in the directory
+  find:
+    paths: "{{ temp_helm_chart_dir.path }}"
+    patterns: "*.tgz,*.gz"
+  register: helm_tar_folders
+
+- name: where is docker installed
+  shell: "which docker"
+  register: docker_install
+
+- name: configure docker to be insecure for our registry so we can push to it
+  block:
+    - name: copy the insecure docker config file to host
+      ansible.builtin.template:
+        src: "{{ role_path }}/templates/docker-daemon.json.j2"
+        dest: "/var/snap/docker/current/config/daemon.json"
+        mode: 0644
+      become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+
+    - name: restart docker
+      shell: "snap restart docker"
+  when: docker_install.stdout | regex_search('^\\/snap\\/') 
+
+- name: configure docker to be insecure for our registry so we can push to it
+  block:
+    - name: make sure docker config location exists
+      file:
+        path: "/etc/docker"
+        state: directory
+        mode: '0755'
+
+    - name: copy the insecure docker config file to host
+      ansible.builtin.template:
+        src: "{{ role_path }}/templates/docker-daemon.json.j2"
+        dest: "/etc/docker/daemon.json"
+        mode: 0644
+      become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+
+    - name: restart daemon
+      shell: "systemctl daemon-reload"
+
+    - name: restart docker
+      shell: "systemctl restart docker"
+  when: not ( docker_install.stdout | regex_search('^\\/snap\\/') )
+
+- name: check for containers that the helm charts need
+  include_tasks: populate_nexus_docker.yml
+  loop:  "{{ helm_tar_folders.files }}"

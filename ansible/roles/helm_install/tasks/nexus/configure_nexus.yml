@@ -1,0 +1,91 @@
+---
+
+- name: Declaring Groovy script for {{ item }}
+  ansible.builtin.uri:
+    url: "{{ api_url }}{{ nexus_api_context_path }}{{ nexus_rest_api_endpoint }}"
+    timeout: "{{ nexus_api_timeout | int }}"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    body_format: json
+    method: POST
+    force_basic_auth: true
+    status_code: [204, 500]
+    validate_certs: "{{ nexus_api_validate_certs }}"
+    body:
+      name: "{{ item }}"
+      type: groovy
+      content: "{{ lookup('file', 'nexus/{{ item }}.groovy') }}"
+    remote_src: yes
+  loop: "{{ nexus_groovy_scripts }}"
+
+- name: enable anonymous access
+  vars:
+    resource_path: "{{ nexus_api_context_path }}{{ nexus_rest_api_endpoint }}/setup_anonymous_access/run"
+    args:
+      anonymous_access: "{{ nexus_anonymous_access }}"
+  ansible.builtin.uri:
+    url: "{{ api_url }}{{ resource_path }}"
+    timeout: "{{ nexus_api_timeout | int }}"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    headers:
+      Content-Type: text/plain
+    method: POST
+    force_basic_auth: true
+    validate_certs: "{{ nexus_api_validate_certs }}"
+    body: "{{ args | to_json }}"
+    remote_src: yes
+  register: script_run
+
+- name: get current realms
+  vars:
+    resource_path: "{{ nexus_api_context_path }}service/rest/v1/security/realms/active"
+  ansible.builtin.uri:
+    url: "{{ api_url }}{{ resource_path }}"
+    timeout: "{{ nexus_api_timeout | int }}"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    method: GET
+    force_basic_auth: true
+    validate_certs: "{{ nexus_api_validate_certs }}"
+    remote_src: yes
+  register: nexus_current_realms
+
+- name: enable docker bearer token realm
+  vars:
+    resource_path: "{{ nexus_api_context_path }}service/rest/v1/security/realms/active"
+    args:
+      token_realm_id: ["DockerToken"]
+  ansible.builtin.uri:
+    url: "{{ api_url }}{{ resource_path }}"
+    timeout: "{{ nexus_api_timeout | int }}"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    headers:
+      Content-Type: application/json
+    status_code: [204]
+    method: PUT
+    force_basic_auth: true
+    validate_certs: "{{ nexus_api_validate_certs }}"
+    body: "{{ ( ( nexus_current_realms.json | list ) + args.token_realm_id ) | to_json }}"
+    remote_src: yes
+
+- name: build the nexus proxy list
+  import_tasks: build_proxy_list_nexus.yml
+
+- name: configure all repos
+  vars: 
+    resource_path: "{{ nexus_api_context_path }}{{ nexus_rest_api_endpoint }}/create_repos_from_list/run"
+    args: "{{ _nexus_repos_global_list | d([]) }}"
+  ansible.builtin.uri:
+    url: "{{ api_url }}{{ resource_path }}"
+    timeout: "{{ nexus_api_timeout | int }}"
+    user: admin
+    password: "{{ nexus_admin_password }}"
+    headers:
+      Content-Type: text/plain
+    method: POST
+    force_basic_auth: true
+    validate_certs: "{{ nexus_api_validate_certs }}"
+    body: "{{ args | to_json }}"
+    remote_src: yes

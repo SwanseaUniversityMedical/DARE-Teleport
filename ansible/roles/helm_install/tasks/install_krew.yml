@@ -1,0 +1,40 @@
+---
+
+- name: Make tempdir
+  file:
+    path: /tmp/krew
+    state: directory
+
+- name: Fetch krew
+  get_url:
+    url: "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-{{ os_fact }}_{{ arch_fact }}.tar.gz"
+    dest: /tmp/krew.tar.gz
+  environment: "{{ proxy_env }}"
+
+- name: Unarchive krew
+  unarchive:
+    src: /tmp/krew.tar.gz
+    dest: /tmp/krew
+    remote_src: true
+
+- name: Copy krew plugin to /usr/local/bin
+  copy:
+    src: "/tmp/krew/krew-{{ ansible_system|lower }}_{{ arch_fact }}"
+    dest: /usr/local/bin/kubectl-krew
+    mode: 0755
+    remote_src: true
+
+- name: Run Krew Update
+  shell: "{{ kubectl_bin_path }} krew update"
+
+- name: set krew extra path
+  set_fact:
+    krew_path: "${KREW_ROOT:-$HOME/.krew}/bin"
+
+# - name: add {{ krew_path }} to path
+#   lineinfile: >
+#     dest=/etc/environment
+#     state=present
+#     backrefs=yes
+#     regexp='PATH=(["]*)((?!.*?{{ krew_path }}).*?)(["]*)$'
+#     line="PATH=\1\2:{{ krew_path }}\3"

@@ -1,0 +1,31 @@
+---
+
+- set_fact:
+    new_image_name: "{{ item | trim | replace('harbor.ukserp.ac.uk/', '') | trim }}"
+
+- name: Log into harbor and force re-authorization
+  community.docker.docker_login:
+    registry_url: "harbor.ukserp.ac.uk"
+    username: "{{ harbor_dare_user }}"
+    password: "{{ harbor_dare_pass }}"
+    reauthorize: true
+
+- name: Pull an image
+  community.docker.docker_image:
+    name: "{{ item | trim }}"
+    source: pull
+
+- name: Log into nexus registry and force re-authorization
+  community.docker.docker_login:
+    registry_url: "{{ docker_url }}"
+    username: admin
+    password: "{{ nexus_admin_password }}"
+    reauthorize: true
+  
+- name: Tag and push to Nexus
+  community.docker.docker_image:
+    name: "{{ item | trim }}"
+    repository: "{{ docker_url }}/{{ new_image_name }}"
+    push: true
+    source: local
+  ignore_errors: true

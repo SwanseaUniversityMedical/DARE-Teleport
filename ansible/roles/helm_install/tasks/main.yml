@@ -1,0 +1,27 @@
+---
+# tasks file for helm_install
+- import_tasks: facts.yml
+  when: k3s_lead_control_node
+
+- import_tasks: deploy.yml
+  when: k3s_lead_control_node
+
+- import_tasks: nexus/nexus_facts.yml
+
+- import_tasks: nexus/configure_nexus.yml
+  when: 
+    - k3s_lead_control_node
+    - k3s_deploy_nexus
+
+- import_tasks: nexus/populate_nexus.yml
+  when: 
+    - k3s_lead_control_node
+    - k3s_deploy_nexus
+
+
+# THIS ASSUMES THAT YOUR MICROK8S IS WORKING, AND THAT YOU'VE DONE
+# microk8s config 
+# AND PUT IT IN A SEPARATE FILE AT THE PATH YOU GIVE TO     
+# k3s_server_environment:
+#     - key: KUBECONFIG
+#       value: '/root/.kube/config'

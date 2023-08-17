@@ -1,0 +1,27 @@
+micro_cluster:
+  vars:
+    k3s_deploy_rookceph: false
+    k3s_deploy_metallb: true
+    k3s_deploy_opa: false
+    k3s_deploy_argo: false
+    k3s_deploy_postop: false
+    k3s_deploy_nexus: true
+    k3s_deploy_minioop: false
+
+    k3s_server_environment:
+    - key: KUBECONFIG
+      value: '/root/.kube/config'
+
+    k3s_metallb_addresses: 
+      - 10.0.0.0/24
+
+    harbor_dare_user: ""
+    harbor_dare_pass: ""
+
+  hosts:
+    single_instance:
+      ansible_host: 10.211.55.8
+      ansible_user: root
+      ansible_ssh_private_key_file: ~/.ssh/id_ed25519
+      k3s_lead_control_node: true
+

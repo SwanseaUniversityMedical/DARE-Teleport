@@ -1,0 +1,266 @@
+---
+# defaults file for helm_install
+# The OS of the Helm redistributable
+helm_os: 'linux'
+
+# File name of the Helm redistributable file
+helm_redis_filename: 'helm-v{{ helm_version }}-{{ helm_os }}-{{ helm_architecture }}.tar.gz'
+
+# Helm version number
+helm_version: '3.12.2'
+
+# The CPU architecture of the Helm executable to install
+helm_architecture: 'amd64'
+
+# Mirror to download Helm from
+helm_mirror: 'https://get.helm.sh'
+
+# Dir where Helm should be installed
+helm_install_dir: '/usr/local/share/helm'
+
+# Directory to store files downloaded for Helm
+helm_download_dir: "{{ x_ansible_download_dir | default(ansible_env.HOME + '/.ansible/tmp/downloads') }}"
+
+proxy_env: 
+  http_proxy: ''
+  https_proxy: ''
+
+# Really don't recommend changing these values unless you know what you're doing
+# or you're trying to install to a minikube-type environment
+k3s_deploy_rookceph: true
+k3s_deploy_metallb: true
+
+# These should be changed depending on what cluster you're targeting with the ansible
+k3s_deploy_opa: false
+k3s_deploy_argo: false
+k3s_deploy_postop: false
+k3s_deploy_nexus: false
+k3s_deploy_minioop: false
+
+helm_values_dir: "helm"
+helm_chart_dir: "helmdl"
+nexus_conf_dir: "nexus"
+
+k3s_become_for_all: true
+k3s_become_for_directory_creation: false
+
+k3s_metallb_addresses: []
+
+k3s_server_environment:
+  - key: KUBECONFIG
+    value: '/etc/rancher/k3s/k3s.yaml'
+
+k3s_helm_install:
+  metallb:
+    install_name: 'metallb'
+    install_namespace: 'networking'
+    chart_name: 'metallb'
+    chart_version: '4.4.2'
+    repo_address: 'https://charts.bitnami.com/bitnami'
+    install_values: ''
+  argocd:
+    install_name: 'argocd'
+    install_namespace: 'argocd'
+    chart_name: 'argo-cd'
+    chart_version: '5.39.0'
+    repo_address: 'https://argoproj.github.io/argo-helm'
+    install_values: 'argocd-helm.yaml'
+  nexus:
+    install_name: 'nexus'
+    install_namespace: 'nexus'
+    chart_name: 'nexus-repository-manager'
+    chart_version: '58.1.0'
+    repo_address: 'https://sonatype.github.io/helm3-charts/'
+    install_values: 'nexus-helm.yaml'
+  opagatekeeper:
+    install_name: 'gatekeeper'
+    install_namespace: 'gatekeeper-system'
+    chart_name: 'gatekeeper'
+    chart_version: 'v3.12.0'
+    repo_address: 'https://open-policy-agent.github.io/gatekeeper/charts'
+    install_values: 'opagatekeeper-helm.yaml'
+  rook_ceph_cluster:
+    install_name: 'rook-ceph-cluster'
+    install_namespace: 'rook-ceph'
+    chart_name: 'rook-ceph-cluster'
+    chart_version: 'v1.11.4'
+    repo_address: 'https://charts.rook.io/release'
+    install_values: 'rook-ceph-cluster.yaml'
+  rook_ceph_operator:
+    install_name: 'rook-ceph'
+    install_namespace: 'rook-ceph'
+    chart_name: 'rook-ceph'
+    chart_version: 'v1.11.4'
+    repo_address: 'https://charts.rook.io/release'
+    install_values: 'rook-ceph-operator.yaml'
+  postgres_operator:
+    install_name: 'postgres-operator'
+    install_namespace: 'postgres-operator'
+    chart_name: 'postgres-operator'
+    chart_version: '1.10.0'
+    repo_address: 'https://opensource.zalando.com/postgres-operator/charts/postgres-operator'
+    install_values: 'postgres-operator.yaml'
+
+
+nexus_docker_proxy_port: 8081
+nexus_docker_group_port: 8082
+nexus_docker_hosted_port: 5000
+
+nexus_config:
+  proxies:
+    docker:
+      - name: harbor.ukserp.ac.uk
+        v1_enabled: true
+        index_type: "REGISTRY"
+        remote_url: https://harbor.ukserp.ac.uk
+        use_nexus_certificates_to_access_index: false
+      - name: docker.io
+        remote_url: https://registry-1.docker.io
+        v1_enabled: true
+        index_type: "HUB"
+        use_nexus_certificates_to_access_index: false
+      - name: k8s.gcr.io
+        v1_enabled: true
+        index_type: "REGISTRY"
+        remote_url: https://k8s.gcr.io
+        use_nexus_certificates_to_access_index: false
+      - name: registry.k8s.io
+        v1_enabled: true
+        index_type: "REGISTRY"
+        remote_url: https://registry.k8s.io
+        v1_enabled: true
+        use_nexus_certificates_to_access_index: false
+      - name: ghcr.io
+        v1_enabled: true
+        index_type: "REGISTRY"
+        remote_url: https://ghcr.io
+        v1_enabled: true
+        use_nexus_certificates_to_access_index: false
+      - name: quay.io
+        v1_enabled: true
+        index_type: "REGISTRY"
+        remote_url: https://quay.io
+        use_nexus_certificates_to_access_index: false
+
+    conda:
+      - name: conda-forge
+        remote_url: https://conda.anaconda.org/conda-forge/
+      - name: plotly
+        remote_url: https://conda.anaconda.org/plotly/
+      - name: rapidsai
+        remote_url: https://conda.anaconda.org/rapidsai/
+      - name: esri
+        remote_url: https://conda.anaconda.org/esri/
+      - name: pyg
+        remote_url: https://conda.anaconda.org/pyg/
+      - name: huggingface
+        remote_url: https://conda.anaconda.org/huggingface/
+      - name: pytorch
+        remote_url: https://conda.anaconda.org/pytorch/
+      - name: anaconda
+        remote_url: https://repo.anaconda.com/pkgs/main
+      - name: nvidia
+        remote_url: https://conda.anaconda.org/nvidia/
+      - name: r
+        remote_url: https://repo.anaconda.com/pkgs/r/
+      - name: bioconda
+        remote_url: https://conda.anaconda.org/bioconda/
+
+    pypi:
+      - name: pypi
+        remote_url: https://pypi.org
+
+    cran:
+      - name: r-cran
+        remote_url: https://cran.r-project.org/
+
+    helm: []
+
+  repo_groups:
+    docker:
+      - name: docker
+        http_port: "{{ nexus_docker_group_port }}"
+        v1_enabled: true
+        member_repos:
+          - harbor.ukserp.ac.uk
+          - docker.io
+          - k8s.gcr.io
+          - registry.k8s.io
+          - ghcr.io
+          - quay.io
+          - docker-hosted
+
+  hosted:
+    docker:
+      - name: docker-hosted
+        http_port: "{{ nexus_docker_hosted_port }}"
+        v1_enabled: true
+
+    helm:
+      - name: helm-hosted
+
+nexus_blob_names: # Splited blob name list @ blob_vars.yml
+  pypi:
+    blob: default
+  docker:
+    blob: default
+  helm:
+    blob: default
+  r:
+    blob: default
+  conda:
+    blob: default
+
+_nexus_repos_docker_defaults:
+  blob_store: "{{ nexus_blob_names.docker.blob }}"
+  force_basic_auth: false
+  strict_content_validation: true
+  version_policy: release # release, snapshot or mixed
+  layout_policy: strict # strict or permissive
+  write_policy: allow_once # one of "allow", "allow_once" or "deny"
+  maximum_component_age: 1440 # Nexus gui default. For proxies only
+  maximum_metadata_age: 1440 # Nexus gui default. For proxies only
+  negative_cache_enabled: true # Nexus gui default. For proxies only
+  negative_cache_ttl: 1440 # Nexus gui default. For proxies only
+  # More about Foreign Layers https://help.sonatype.com/repomanager3/formats/docker-registry/foreign-layers
+  cache_foreign_layers: false # Nexus gui default. For proxies only
+  foreign_layer_url_whitelist: [] # Nexus gui default. For proxies only
+
+_nexus_repos_pypi_defaults:
+  blob_store: "{{ nexus_blob_names.pypi.blob }}"
+  strict_content_validation: true
+  version_policy: release # release, snapshot or mixed
+  layout_policy: strict # strict or permissive
+  write_policy: allow_once # one of "allow", "allow_once" or "deny"
+  maximum_component_age: 1440 # Nexus gui default. For proxies only
+  maximum_metadata_age: 1440 # Nexus gui default. For proxies only
+  negative_cache_enabled: true # Nexus gui default. For proxies only
+  negative_cache_ttl: 1440 # Nexus gui default. For proxies only
+
+_nexus_repos_helm_defaults:
+  blob_store: "{{ nexus_blob_names.helm.blob }}"
+  strict_content_validation: true
+  layout_policy: strict # strict or permissive
+  write_policy: allow_once # one of "allow", "allow_once" or "deny"
+  maximum_component_age: 1440 # Nexus gui default. For proxies only
+  maximum_metadata_age: 1440 # Nexus gui default. For proxies only
+  negative_cache_enabled: true # Nexus gui default. For proxies only
+  negative_cache_ttl: 1440 # Nexus gui default. For proxies only
+
+# R support
+_nexus_repos_r_defaults:
+  blob_store: "{{ nexus_blob_names.r.blob }}"
+  strict_content_validation: true
+  version_policy: release # release, snapshot or mixed
+  layout_policy: strict # strict or permissive
+  write_policy: allow_once # one of "allow", "allow_once" or "deny"
+  maximum_component_age: 1440 # Nexus gui default. For proxies only
+  maximum_metadata_age: 1440 # Nexus gui default. For proxies only
+  negative_cache_enabled: true # Nexus gui default. For proxies only
+  negative_cache_ttl: 1440 # Nexus gui default. For proxies only
+
+nexus_groovy_scripts:
+  - create_repos_from_list
+  - setup_anonymous_access
+
+teleport_chart_directory: "../charts/teleport"

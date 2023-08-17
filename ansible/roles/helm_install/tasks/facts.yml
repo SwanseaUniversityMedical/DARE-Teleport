@@ -1,0 +1,107 @@
+---
+
+- name: get path to kubeconfig file
+  set_fact: 
+    kubeconfig_dir: "{{ item.value }}"
+  loop: "{{ k3s_server_environment }}"
+  when: 
+    - item.key == 'KUBECONFIG'
+
+- name: Create temporary helm values directory
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: "{{ helm_values_dir }}"
+  become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Create temporary helm charts directory
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: "{{ helm_chart_dir }}"
+  become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+  register: temp_helm_chart_dir
+
+- name: copy the helm value files to the host
+  copy:
+    src: "{{ role_path }}/files/helm-values/"
+    dest: "{{ helm_values_dir }}"
+    mode: 0644
+  become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+
+- name: Create temporary Nexus config directory
+  ansible.builtin.tempfile:
+    state: directory
+    suffix: "{{ nexus_conf_dir }}"
+  become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+
+- name: copy the helm value files to the host
+  copy:
+    src: "{{ role_path }}/files/nexus/"
+    dest: "{{ nexus_conf_dir }}"
+    mode: 0644
+  become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+
+- name: copy the metallb config file to the host
+  ansible.builtin.template:
+    src: "{{ role_path }}/templates/metallb-config.yaml.j2"
+    dest: "{{ helm_values_dir }}/metallb-config.yaml"
+    mode: 0644
+  become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+  when: k3s_deploy_metallb
+
+- name: set os fact
+  shell: "uname | tr '[:upper:]' '[:lower:]'"
+  register: os_fact_raw
+
+- name: set arch fact
+  shell: "uname -m | sed -e 's/x86_64/amd64/' -e 's/\\(arm\\)\\(64\\)\\?.*/\\1\\2/' -e 's/aarch64$/arm64/'"
+  register: arch_fact_raw
+
+- set_fact:
+    os_fact: "{{ os_fact_raw.stdout }}"
+    arch_fact: "{{ arch_fact_raw.stdout }}"
+
+- name: ensure that git is installed
+  apt:
+    name: git
+    state: present
+    update_cache: yes
+  become: true
+
+- name: ensure yq is installed
+  community.general.snap:
+    name: yq
+    state: present
+  become: true
+
+- name: ensure docker is installed
+  community.general.snap:
+    name: docker
+    state: present
+  become: true
+
+- name: ensure kubectl is installed
+  shell: which kubectl
+  register: where_kubectl_raw
+
+- name: ensure that helm is installed
+  shell: which helm
+  register: where_helm_raw
+  ignore_errors: true
+
+- name: ensure krew is installed
+  shell: which krew
+  register: where_krew_raw
+  ignore_errors: true
+
+- set_fact:
+    helm_not_installed: "{{ where_helm_raw.stdout == '' }}"
+    krew_not_installed: "{{ where_krew_raw.stdout == '' }}"
+    kubectl_bin_path: "{{ where_kubectl_raw.stdout }}"
+
+- name: if helm isn't installed, install it
+  import_tasks: install_helm.yml
+  when: helm_not_installed
+
+- name: if krew isn't installed, install it
+  import_tasks: install_krew.yml
+  when: krew_not_installed
