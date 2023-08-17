@@ -55,7 +55,7 @@ appHive:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
     chart: hive
     # renovate: datasource=helm depName=hive registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
-    targetRevision: 1.1.0
+    targetRevision: 1.2.0
 
 appMinioTenant:
   enabled: true
