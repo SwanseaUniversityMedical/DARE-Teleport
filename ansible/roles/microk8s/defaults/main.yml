@@ -1,0 +1,22 @@
+---
+
+# version of mk8s to install
+microk8s_channel: "1.28/stable"
+
+# where you want to write the output of microk8s config command
+kubeconfig_file_location: "/root/.kube/"
+
+# does this mk8s need to be told to use nexus as it's docker proxy?
+microk8s_docker_proxy: false
+
+microk8s_registry_mirrors: {}
+# the address is the endpoint of the nexus docker group
+# docker.io: "http://192.168.1.1:8082"
+# harbor.ukserp.ac.uk: "http://192.168.1.1:8082"
+
+## plugin configuration
+microk8s_plugins: {}
+  # dns: true                 # CoreDNS
+  # ingress: true             # Ingress controller for external access
+  # cert-manager: true
+  # rook-ceph: true
