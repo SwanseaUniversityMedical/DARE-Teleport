@@ -22,7 +22,7 @@
 
 - name: copy the helm value files to the host
   copy:
-    src: "{{ role_path }}/files/helm-values/"
+    src: "{{ helm_source_values_dir }}"
     dest: "{{ helm_values_dir }}"
     mode: 0644
   become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
