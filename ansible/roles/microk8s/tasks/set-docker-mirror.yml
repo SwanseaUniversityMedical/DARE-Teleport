@@ -1,0 +1,17 @@
+---
+
+- name: make proxy host file
+  ansible.builtin.template:
+    src: /templates/docker-mirror.j2
+    dest: "/var/snap/microk8s/current/args/certs.d/{{ docker_mirror_config.key }}/hosts.toml"
+    owner: root
+    group: root
+  with_dict: "{{ microk8s_registry_mirrors }}"
+  loop_control:
+    loop_var: docker_mirror_config
+
+- name: stop microk8s
+  command: microk8s stop
+
+- name: restart microk8s
+  command: microk8s start
