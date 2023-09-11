@@ -1,0 +1,5 @@
+server = "{{ docker_mirror_config.key }}"
+
+[host."{{ docker_mirror_config.value }}"]
+	capabilities = ["pull", "resolve"]
+	override_path = true

@@ -18,6 +18,14 @@ micro_cluster:
     harbor_dare_user: ""
     harbor_dare_pass: ""
 
+    kubeconfig_file_location: "/root/.kube/"
+
+    microk8s_plugins:
+      dns: true
+      ingress: true
+      cert-manager: true
+      rook-ceph: true
+
   hosts:
     single_instance:
       ansible_host: 10.211.55.8
