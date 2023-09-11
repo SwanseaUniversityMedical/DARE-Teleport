@@ -50,6 +50,8 @@ k3s_server_environment:
   - key: KUBECONFIG
     value: '/etc/rancher/k3s/k3s.yaml'
 
+helm_source_values_dir: "{{ role_path }}/files/helm-values/"
+
 k3s_helm_install:
   metallb:
     install_name: 'metallb'
