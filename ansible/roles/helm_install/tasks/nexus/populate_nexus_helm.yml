@@ -120,10 +120,3 @@
     full_chart_deps: "{{ extra_charts + chart_deps }}"
 
 
-- name: for each chart dep, process
-  include_tasks: handle_helm_dependencies.yml
-  loop: "{{ full_chart_deps }}"
-  loop_control:
-    loop_var: dep_item
-
-
