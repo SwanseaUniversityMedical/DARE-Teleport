@@ -78,3 +78,36 @@
   loop_control:
     loop_var: dep_item
 
+- name: unpack the chart
+  ansible.builtin.unarchive:
+    src: "{{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz"
+    dest: "{{ temp_helm_chart_dir.path }}"
+    remote_src: yes
+  register: unpacked_location
+
+- set_fact:
+    target_folder_full: "{{ unpack_loc[-1] }}"
+  vars: 
+    unpack_loc: "{{ unpacked_location.src | split('/') }}"
+
+- set_fact:
+    target_folder: "{{ target_flines[0] }}"
+  vars: 
+    target_flines: "{{ target_folder_full | split('-') }}"
+
+- name: use helm to derive any nested chart sources
+  shell: >
+    helm template {{ temp_helm_chart_dir.path }}/{{ target_folder }} | yq '.spec.source?' -o j -I 0
+  register: derived_sources
+
+- set_fact:
+    extra_charts: "{{ extra_charts | default([]) + [ (item | from_json) ] }}"
+  with_items: "{{ derived_sources.stdout_lines }}"
+
+- name: for each nested chart source, process
+  include_tasks: handle_helm_nested.yml
+  loop: "{{ extra_charts }}"
+  loop_control:
+    loop_var: nest_item
+
+
