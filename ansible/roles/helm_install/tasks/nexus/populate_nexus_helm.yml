@@ -120,7 +120,7 @@
 
 - name: for each chart dep, process
   include_tasks: handle_helm_dependencies.yml
-  loop: "{{ full_chart_dep }}"
+  loop: "{{ full_chart_deps }}"
   loop_control:
     loop_var: dep_item
 
