@@ -48,7 +48,7 @@
 - name: copy the metallb config file to the host
   ansible.builtin.template:
     src: "{{ role_path }}/templates/metallb-config.yaml.j2"
-    dest: "{{ temp_helm_values_dir.path }}/metallb-config.yaml"
+    dest: "{{ temp_helm_values_fp }}/metallb-config.yaml"
     mode: 0644
   become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
   when: k3s_deploy_metallb
