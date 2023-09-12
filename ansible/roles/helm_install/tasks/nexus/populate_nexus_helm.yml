@@ -96,8 +96,10 @@
   register: derived_sources
 
 - set_fact:
-    extra_charts: "{{ extra_charts | default([]) + [ (item | from_json) ] }}"
-  with_items: "{{ derived_sources.stdout_lines }}"
+    extra_charts: "{{ extra_charts | default([]) + [ (derv_s_item | from_json) ] }}"
+  with_items: "{{ derived_sources.stdout_lines | reject('search', 'null') }}"
+  loop_control:
+    loop_var: derv_s_item
 
 -  set_fact:
     chart_deps: "{{ chart_deps.stdout_lines | reject('search', 'STATUS') 
