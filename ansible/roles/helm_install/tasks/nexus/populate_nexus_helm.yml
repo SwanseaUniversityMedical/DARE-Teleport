@@ -16,6 +16,7 @@
     password: "{{ harbor_dare_pass }}"
   register: helm_pull_res
   when: source_info.repoURL | regex_search('^https:\\/\\/harbor\\.ukserp\\.ac\\.uk') 
+  environment: "{{ proxy_env }}"
 
 - name: download helm chart
   kubernetes.core.helm_pull:
@@ -27,6 +28,7 @@
   when: 
     - not ( source_info.repoURL | regex_search('^https:\\/\\/harbor\\.ukserp\\.ac\\.uk') ) 
     - not ( source_info.repoURL | regex_search('^oci:\\/\\/') )
+  environment: "{{ proxy_env }}"
 
 - name: download helm chart
   kubernetes.core.helm_pull:
@@ -36,6 +38,7 @@
   register: helm_pull_res
   when: 
     - source_info.repoURL | regex_search('^oci:\\/\\/') 
+  environment: "{{ proxy_env }}"
 
 
 - name: find the actual chart version if a constraint pattern was specified
