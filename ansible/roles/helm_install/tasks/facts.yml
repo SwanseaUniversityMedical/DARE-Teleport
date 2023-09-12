@@ -84,6 +84,16 @@
     state: present
   become: true
 
+- name: ensure that pip is installed
+  apt:
+    name:
+      - python3-pip
+    state: present
+
+- name: ensure the docker python library is installed
+  pip:
+    name: docker
+
 - name: ensure kubectl is installed
   shell: which kubectl
   register: where_kubectl_raw

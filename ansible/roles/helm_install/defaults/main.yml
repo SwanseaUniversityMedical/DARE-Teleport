@@ -108,6 +108,8 @@ nexus_docker_proxy_port: 8081
 nexus_docker_group_port: 8082
 nexus_docker_hosted_port: 5000
 
+k3s_populate_nexus: true
+
 nexus_config:
   proxies:
     docker:

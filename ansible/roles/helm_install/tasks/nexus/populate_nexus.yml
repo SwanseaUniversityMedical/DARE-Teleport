@@ -7,6 +7,12 @@
   include_tasks: populate_nexus_helm.yml
   loop: "{{ app_helm_sources | dict2items }}"
 
+- name: for each chart dep, process
+  include_tasks: handle_helm_dependencies.yml
+  loop: "{{ full_chart_deps }}"
+  loop_control:
+    loop_var: dep_item
+
 - name: find all of the helm charts in the directory
   find:
     paths: "{{ temp_helm_chart_dir.path }}"

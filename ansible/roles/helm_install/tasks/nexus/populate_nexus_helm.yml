@@ -16,6 +16,7 @@
     password: "{{ harbor_dare_pass }}"
   register: helm_pull_res
   when: source_info.repoURL | regex_search('^https:\\/\\/harbor\\.ukserp\\.ac\\.uk') 
+  environment: "{{ proxy_env }}"
 
 - name: download helm chart
   kubernetes.core.helm_pull:
@@ -27,6 +28,7 @@
   when: 
     - not ( source_info.repoURL | regex_search('^https:\\/\\/harbor\\.ukserp\\.ac\\.uk') ) 
     - not ( source_info.repoURL | regex_search('^oci:\\/\\/') )
+  environment: "{{ proxy_env }}"
 
 - name: download helm chart
   kubernetes.core.helm_pull:
@@ -36,6 +38,7 @@
   register: helm_pull_res
   when: 
     - source_info.repoURL | regex_search('^oci:\\/\\/') 
+  environment: "{{ proxy_env }}"
 
 
 - name: find the actual chart version if a constraint pattern was specified
@@ -69,9 +72,51 @@
     helm dependency list {{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz
   register: chart_deps
 
-- name: for each chart dep, process
-  include_tasks: handle_helm_dependencies.yml
-  loop: "{{ chart_deps.stdout_lines | reject('search', 'STATUS') | reject('search', 'WARNING') | list }}"
+- name: unpack the chart
+  ansible.builtin.unarchive:
+    src: "{{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz"
+    dest: "{{ temp_helm_chart_dir.path }}"
+    remote_src: yes
+  register: unpacked_location
+
+- set_fact:
+    target_folder_full: "{{ unpack_loc[-1] }}"
+  vars: 
+    unpack_loc: "{{ unpacked_location.src | split('/') }}"
+
+- set_fact:
+    target_folder: "{{ target_flines[0] }}"
+  vars: 
+    target_flines: "{{ target_folder_full | split('-') }}"
+
+
+- name: use helm to derive any nested chart sources
+  shell: >
+    helm template {{ temp_helm_chart_dir.path }}/{{ target_folder }} | yq '.spec.source?' -o j -I 0
+  register: derived_sources
+
+- set_fact:
+    extra_charts: "{{ extra_charts | default([]) + [ (derv_s_item | from_json) ] }}"
+  with_items: "{{ derived_sources.stdout_lines | reject('search', 'null') }}"
   loop_control:
-    loop_var: dep_item
+    loop_var: derv_s_item
+
+-  set_fact:
+    chart_deps: "{{ chart_deps.stdout_lines | reject('search', 'STATUS') 
+                                        | reject('search', 'WARNING') 
+                                        | map('split', '\t')
+                                        | list
+                                         }}"
+
+- set_fact:
+    chart_deps: >-
+      {{ chart_deps | map('map', 'trim')
+                    | map('zip', ['chart', 'targetRevision', 'repoURL', 'status']) 
+                    | map('map', 'reverse') 
+                    | map('community.general.dict') }}
+
+
+- set_fact:
+    full_chart_deps: "{{ extra_charts + chart_deps }}"
+
 
