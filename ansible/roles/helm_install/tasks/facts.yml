@@ -12,6 +12,7 @@
     state: directory
     suffix: "{{ helm_values_dir }}"
   become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+  register: temp_helm_values_dir
 
 - name: Create temporary helm charts directory
   ansible.builtin.tempfile:
@@ -22,28 +23,32 @@
 
 - name: copy the helm value files to the host
   copy:
-    src: "{{ role_path }}/files/helm-values/"
-    dest: "{{ helm_values_dir }}"
+    src: "{{ helm_source_values_dir }}"
+    dest: "{{ temp_helm_values_dir.path }}/{{ helm_values_dir }}"
     mode: 0644
   become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+
+- set_fact:
+    temp_helm_values_fp: "{{ temp_helm_values_dir.path }}/{{ helm_values_dir }}"
 
 - name: Create temporary Nexus config directory
   ansible.builtin.tempfile:
     state: directory
     suffix: "{{ nexus_conf_dir }}"
   become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
+  register: temp_nexus_conf_dir
 
-- name: copy the helm value files to the host
+- name: copy the nexus config files to the host
   copy:
     src: "{{ role_path }}/files/nexus/"
-    dest: "{{ nexus_conf_dir }}"
+    dest: "{{ temp_nexus_conf_dir.path }}/{{ nexus_conf_dir }}"
     mode: 0644
   become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
 
 - name: copy the metallb config file to the host
   ansible.builtin.template:
     src: "{{ role_path }}/templates/metallb-config.yaml.j2"
-    dest: "{{ helm_values_dir }}/metallb-config.yaml"
+    dest: "{{ temp_helm_values_fp }}/metallb-config.yaml"
     mode: 0644
   become: "{{ k3s_become_for_directory_creation | ternary(true, false, k3s_become_for_all) }}"
   when: k3s_deploy_metallb
@@ -78,6 +83,16 @@
     name: docker
     state: present
   become: true
+
+- name: ensure that pip is installed
+  apt:
+    name:
+      - python3-pip
+    state: present
+
+- name: ensure the docker python library is installed
+  pip:
+    name: docker
 
 - name: ensure kubectl is installed
   shell: which kubectl

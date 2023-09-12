@@ -9,6 +9,7 @@
     username: "{{ harbor_dare_user }}"
     password: "{{ harbor_dare_pass }}"
     reauthorize: true
+  environment: "{{ proxy_env }}"
 
 - name: Pull an image
   community.docker.docker_image:
