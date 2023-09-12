@@ -17,6 +17,7 @@
   when: 
     - k3s_lead_control_node
     - k3s_deploy_nexus
+    - k3s_populate_nexus
 
 
 # THIS ASSUMES THAT YOUR MICROK8S IS WORKING, AND THAT YOU'VE DONE
