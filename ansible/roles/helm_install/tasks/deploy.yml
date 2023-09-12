@@ -19,7 +19,7 @@
     kubeconfig: "{{ kubeconfig_dir }}"
     release_name: "{{ k3s_helm_install.rook_ceph_operator.install_name }}"
     release_namespace: "{{ k3s_helm_install.rook_ceph_operator.install_namespace }}"
-    values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.rook_ceph_operator.install_values }}"
+    values_files: "{{ temp_helm_values_fp }}/{{ k3s_helm_install.rook_ceph_operator.install_values }}"
     wait: true
   environment: "{{ proxy_env }}"
   when:
@@ -35,7 +35,7 @@
     kubeconfig: "{{ kubeconfig_dir }}"
     release_name: "{{ k3s_helm_install.rook_ceph_cluster.install_name }}"
     release_namespace: "{{ k3s_helm_install.rook_ceph_cluster.install_namespace }}"
-    values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.rook_ceph_cluster.install_values }}"
+    values_files: "{{ temp_helm_values_fp }}/{{ k3s_helm_install.rook_ceph_cluster.install_values }}"
     wait: true
   environment: "{{ proxy_env }}"
   when:
@@ -60,7 +60,7 @@
 - name: add metallb config
   kubernetes.core.k8s:
     state: present
-    src: "{{ helm_values_dir }}/metallb-config.yaml"
+    src: "{{ temp_helm_values_fp }}/metallb-config.yaml"
   when:
     - k3s_deploy_metallb
 
@@ -74,7 +74,7 @@
     kubeconfig: "{{ kubeconfig_dir }}"
     release_name: "{{ k3s_helm_install.opagatekeeper.install_name }}"
     release_namespace: "{{ k3s_helm_install.opagatekeeper.install_namespace }}"
-    values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.opagatekeeper.install_values }}"
+    values_files: "{{ temp_helm_values_fp }}/{{ k3s_helm_install.opagatekeeper.install_values }}"
     wait: true
   environment: "{{ proxy_env }}"
   when:
@@ -90,7 +90,7 @@
     kubeconfig: "{{ kubeconfig_dir }}"
     release_name: "{{ k3s_helm_install.argocd.install_name }}"
     release_namespace: "{{ k3s_helm_install.argocd.install_namespace }}"
-    values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.argocd.install_values }}"
+    values_files: "{{ temp_helm_values_fp }}/{{ k3s_helm_install.argocd.install_values }}"
     wait: true
   environment: "{{ proxy_env }}"
   when:
@@ -121,7 +121,7 @@
     kubeconfig: "{{ kubeconfig_dir }}"
     release_name: "{{ k3s_helm_install.nexus.install_name }}"
     release_namespace: "{{ k3s_helm_install.nexus.install_namespace }}"
-    values_files: "{{ helm_values_dir }}/{{ k3s_helm_install.nexus.install_values }}"
+    values_files: "{{ temp_helm_values_fp }}/{{ k3s_helm_install.nexus.install_values }}"
     wait: true
   environment: "{{ proxy_env }}"
   when:
