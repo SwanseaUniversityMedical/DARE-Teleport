@@ -78,7 +78,7 @@
     path: "{{ kubeconfig_file_location }}"
     state: directory
     owner: root
-    group: root
+    mode: '0600'
 
 - name: put to given kubeconfig path
   copy:
