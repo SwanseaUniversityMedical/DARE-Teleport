@@ -72,12 +72,6 @@
     helm dependency list {{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz
   register: chart_deps
 
-- name: for each chart dep, process
-  include_tasks: handle_helm_dependencies.yml
-  loop: "{{ chart_deps.stdout_lines | reject('search', 'STATUS') | reject('search', 'WARNING') | list }}"
-  loop_control:
-    loop_var: dep_item
-
 - name: unpack the chart
   ansible.builtin.unarchive:
     src: "{{ temp_helm_chart_dir.path }}/{{ source_info.chart }}-{{ source_info.targetRevision }}.tgz"
@@ -95,6 +89,7 @@
   vars: 
     target_flines: "{{ target_folder_full | split('-') }}"
 
+
 - name: use helm to derive any nested chart sources
   shell: >
     helm template {{ temp_helm_chart_dir.path }}/{{ target_folder }} | yq '.spec.source?' -o j -I 0
@@ -104,10 +99,29 @@
     extra_charts: "{{ extra_charts | default([]) + [ (item | from_json) ] }}"
   with_items: "{{ derived_sources.stdout_lines }}"
 
-- name: for each nested chart source, process
-  include_tasks: handle_helm_nested.yml
-  loop: "{{ extra_charts }}"
+-  set_fact:
+    chart_deps: "{{ chart_deps.stdout_lines | reject('search', 'STATUS') 
+                                        | reject('search', 'WARNING') 
+                                        | map('split', '\t')
+                                        | list
+                                         }}"
+
+- set_fact:
+    chart_deps: >-
+      {{ chart_deps | map('map', 'trim')
+                    | map('zip', ['chart', 'targetRevision', 'repoURL', 'status']) 
+                    | map('map', 'reverse') 
+                    | map('community.general.dict') }}
+
+
+- set_fact:
+    full_chart_deps: "{{ extra_charts + chart_deps }}"
+
+
+- name: for each chart dep, process
+  include_tasks: handle_helm_dependencies.yml
+  loop: "{{ full_chart_dep }}"
   loop_control:
-    loop_var: nest_item
+    loop_var: dep_item
 
 
