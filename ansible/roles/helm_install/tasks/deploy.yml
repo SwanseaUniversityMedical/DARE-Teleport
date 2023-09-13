@@ -172,6 +172,7 @@
         paths: "{{ extra_manifests_folder }}"
         patterns: "*.yaml,*.yml"
       register: all_extra_manifests
+      delegate_to: localhost
 
     - name: deploy each manifest
       kubernetes.core.k8s:
