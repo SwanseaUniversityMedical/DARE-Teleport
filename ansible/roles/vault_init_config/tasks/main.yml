@@ -1,0 +1,61 @@
+---
+
+- name: get path to kubeconfig file
+  set_fact: 
+    kubeconfig_dir: "{{ item.value }}"
+  loop: "{{ k3s_server_environment }}"
+  when: 
+    - item.key == 'KUBECONFIG'
+
+- name: get all vault pods in vault namespace
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Pod
+    namespace: "{{ vault_namespace }}"
+    label_selectors:
+      - "app.kubernetes.io/instance={{ vault_install_name }}"
+      - "app.kubernetes.io/name=vault"
+    kubeconfig: "{{ kubeconfig_dir }}"
+  register: vault_pods_spec
+
+- set_fact:
+    vault_pods: "{{ vault_pods | default([]) + [ item.metadata.name ] }}"
+  with_items: "{{ vault_pods_spec.resources }}"
+
+- include_tasks: init.yml
+  when: vault_unseal_required
+
+- set_fact:
+    vault_root_token: "{{ vault_init.root_token }}"
+  when: vault_unseal_required
+
+- name: log in to vault
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ vault_pods[0] }}"
+    command: "vault login {{ vault_root_token }}"
+
+# set up kubernetes authentication for each given cluster
+- include_tasks: auth.yml
+  loop: "{{ hosts_configure_auth }}"
+  loop_control:
+    loop_var: remote_host
+
+- name: gather all the policy files
+  find: 
+    paths: "{{ vault_policy_directory }}"
+    patterns: "*.hcl"
+  register: all_policies
+  delegate_to: localhost
+
+- include_tasks: policies.yml
+  loop: "{{ all_policies.files }}"
+  loop_control:
+    loop_var: policy_file
+  when: all_policies.files | length > 0
+
+# set up all auth roles for each cluster
+- include_tasks: authroles.yml
+  loop: "{{ hosts_configure_auth }}"
+  loop_control:
+    loop_var: host_configure

@@ -26,6 +26,7 @@
 
 - name: Run Krew Update
   shell: "{{ kubectl_bin_path }} krew update"
+  environment: "{{ proxy_env }}"
 
 - name: set krew extra path
   set_fact:

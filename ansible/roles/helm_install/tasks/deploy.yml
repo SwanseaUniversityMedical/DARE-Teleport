@@ -127,6 +127,22 @@
   when:
     - k3s_deploy_nexus
 
+# vault
+- name: deploy vault helm chart
+  kubernetes.core.helm:
+    chart_ref: "{{ k3s_helm_install.vault.chart_name }}"
+    chart_repo_url: "{{ k3s_helm_install.vault.repo_address }}"
+    chart_version: "{{ k3s_helm_install.vault.chart_version }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig_dir }}"
+    release_name: "{{ k3s_helm_install.vault.install_name }}"
+    release_namespace: "{{ k3s_helm_install.vault.install_namespace }}"
+    values_files: "{{ temp_helm_values_fp }}/{{ k3s_helm_install.vault.install_values }}"
+    wait: true
+  environment: "{{ proxy_env }}"
+  when:
+    - k3s_deploy_vault
+
 # minio operator
 - name: deploy minio operator
   block:
@@ -148,4 +164,22 @@
         PATH: '{{ current_path.stdout }}:{{ home_dir.stdout }}/.krew/bin'
   when:
     - k3s_deploy_minioop
+
+- name: deploy extra manifests in given folder
+  block:
+    - name: get all manifests in folder
+      find: 
+        paths: "{{ extra_manifests_folder }}"
+        patterns: "*.yaml,*.yml"
+      register: all_extra_manifests
+      delegate_to: localhost
+
+    - name: deploy each manifest
+      kubernetes.core.k8s:
+        state: present
+        definition: "{{ lookup('file', '{{ item.path }}') | from_yaml_all }}"
+      with_items: "{{ all_extra_manifests.files }} "
+  when:
+    - k3s_deploy_extra_manifests
+
   
