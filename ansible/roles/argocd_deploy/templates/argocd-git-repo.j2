@@ -1,21 +1,21 @@
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ item.name }}-helm
+  name: {{ item.name }}-git
   namespace: {{ argocd_namespace }}
   labels:
     argocd.argoproj.io/secret-type: repository
 stringData:
   name: {{ item.name }}
   url: {{ item.url }}
-  type: helm
+  type: git
   {% if username in item %}
   username: {{ item.username }}
   password: {{ item.password }}
   {% endif %}
-  {% if tls_cert_data in item %}
-  tlsClientCertData: {{ item.tls_cert_data }}
-  tlsClientCertKey: {{ item.tls_cert_key }}
+  {% if ssh_private_key_file in item %}
+  sshPrivateKey: |
+    {{ lookup('file', item.ssh_private_key_file) }}
   {% endif %}
   {% if proxy in item %}
   proxy: {{ item.proxy }}

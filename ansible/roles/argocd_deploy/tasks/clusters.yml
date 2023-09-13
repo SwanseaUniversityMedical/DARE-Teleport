@@ -1,16 +1,23 @@
 ---
 
-- name: get the kubernetes CA cert
-  shell: kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.certificate-authority-data}' | base64 --decode
-  delegate_to: "{{ item.remote_host }}"
-  register: raw_ca_cert
-
 - name: get the kubernetes host url
   shell: kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.server}'
   delegate_to: "{{ item.remote_host }}"
   register: raw_host_url
 
+# cadata
+- name: get the kubernetes CA cert
+  shell: kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.certificate-authority-data}' | base64 --decode
+  delegate_to: "{{ item.remote_host }}"
+  register: raw_ca_cert
+
 - set_fact:
-    vault_secret: "{{ vault_secret_spec.resources[0].data.token | b64decode }}"
     ca_cert: "{{ raw_ca_cert.stdout }}"
     host_url: "{{ raw_host_url.stdout }}"
+    key_data: "{{ lookup('file', item.local_path_to_key_file) }}"
+    cert_data: "{{ lookup('file', item.local_path_to_cert_file) }}"
+
+- name: make the argocd cluster secrets
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ role_path }}/templates/argocd-cluster-secrets.yml.j2"
