@@ -21,3 +21,4 @@
   kubernetes.core.k8s:
     state: present
     src: "{{ role_path }}/templates/argocd-cluster-secrets.j2"
+    kubeconfig: "{{ kubeconfig_dir }}"
