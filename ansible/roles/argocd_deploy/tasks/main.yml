@@ -1,3 +1,21 @@
 ---
 
-# configure and populate vault
+- name: get path to kubeconfig file
+  set_fact: 
+    kubeconfig_dir: "{{ item.value }}"
+  loop: "{{ k3s_server_environment }}"
+  when: 
+    - item.key == 'KUBECONFIG'
+
+- include_tasks: repos.yml
+  loop: "{{ repos }}"
+
+# make the cluster secrets
+- include_tasks: clusters.yml
+  loop: "{{ clusters }}"
+
+- name: deploy the teleport chart!
+  kubernetes.core.k8s:
+    state: present
+    template: '{{ role_path }}/templates/app-watcher.j2'
+    kubeconfig: "{{ kubeconfig_dir }}"

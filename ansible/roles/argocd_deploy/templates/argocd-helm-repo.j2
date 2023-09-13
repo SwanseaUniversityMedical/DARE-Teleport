@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ item.name }}-helm
+  namespace: {{ argocd_namespace }}
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  name: {{ item.name }}
+  url: {{ item.url }}
+  type: helm
+{% if item.username is defined %}
+  username: {{ item.username }}
+  password: {{ item.password }}
+{% endif %}
+{% if item.tls_cert_data is defined %}
+  tlsClientCertData: {{ item.tls_cert_data }}
+  tlsClientCertKey: {{ item.tls_cert_key }}
+{% endif %}
+{% if item.proxy is defined %}
+  proxy: {{ item.proxy }}
+{% endif %}
