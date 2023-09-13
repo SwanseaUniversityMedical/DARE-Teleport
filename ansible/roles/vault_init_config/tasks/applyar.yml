@@ -13,3 +13,5 @@
       policies={{ role_configure.token_policies }} \
       ttl={{ role_configure.token_ttl }}
     "
+  environment:
+    VAULT_TOKEN: "{{ vault_root_token }}"

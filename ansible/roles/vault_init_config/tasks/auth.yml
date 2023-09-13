@@ -5,6 +5,8 @@
     namespace: "{{ vault_namespace }}"
     pod: "{{ vault_pods[0] }}"
     command: "vault auth enable -path={{ remote_host.vault_auth_path }} kubernetes"
+  environment:
+    VAULT_TOKEN: "{{ vault_root_token }}"
 
 - name: get the vault secret
   kubernetes.core.k8s_info:
@@ -41,3 +43,5 @@
       kubernetes_ca_cert=\"{{ ca_cert }}\" \
       issuer=\"https://kubernetes.default.svc.cluster.local\" \
       disable_iss_validation=\"true\""
+  environment:
+    VAULT_TOKEN: "{{ vault_root_token }}"

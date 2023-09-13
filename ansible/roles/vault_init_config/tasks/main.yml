@@ -25,6 +25,10 @@
 - include_tasks: init.yml
   when: vault_unseal_required
 
+- set_fact:
+    vault_root_token: "{{ vault_init.root_token }}"
+  when: vault_unseal_required
+
 # set up kubernetes authentication for each given cluster
 - include_tasks: auth.yml
   loop: "{{ hosts_configure_auth }}"

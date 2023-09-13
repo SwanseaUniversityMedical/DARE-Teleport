@@ -12,3 +12,5 @@
       {{ policy_content }}
       EOF
       "
+  environment:
+    VAULT_TOKEN: "{{ vault_root_token }}"
