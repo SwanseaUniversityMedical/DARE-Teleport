@@ -29,6 +29,12 @@
     vault_root_token: "{{ vault_init.root_token }}"
   when: vault_unseal_required
 
+- name: log in to vault
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ vault_pods[0] }}"
+    command: "vault login {{ vault_root_token }}"
+
 # set up kubernetes authentication for each given cluster
 - include_tasks: auth.yml
   loop: "{{ hosts_configure_auth }}"
