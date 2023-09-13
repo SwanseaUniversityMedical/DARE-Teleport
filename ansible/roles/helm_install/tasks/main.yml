@@ -7,6 +7,9 @@
   when: k3s_lead_control_node
 
 - import_tasks: nexus/nexus_facts.yml
+  when: 
+    - k3s_lead_control_node
+    - k3s_deploy_nexus
 
 - import_tasks: nexus/configure_nexus.yml
   when: 
