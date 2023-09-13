@@ -1,0 +1,13 @@
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: argocd-service-user
+spec:
+  groups:
+  - system:authenticated
+  request: {{ user_csr.csr | b64encode }}
+  signerName: kubernetes.io/kube-apiserver-client
+  usages:
+  - digital signature
+  - key encipherment
+  - client auth
