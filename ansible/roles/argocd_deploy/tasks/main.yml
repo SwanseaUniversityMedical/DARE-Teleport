@@ -17,5 +17,5 @@
 - name: deploy the teleport chart!
   kubernetes.core.k8s:
     state: present
-    src: '{{ role_path }}/templates/app-watcher.j2'
+    template: '{{ role_path }}/templates/app-watcher.j2'
     kubeconfig: "{{ kubeconfig_dir }}"
