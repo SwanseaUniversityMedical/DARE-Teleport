@@ -1,0 +1,7 @@
+---
+
+# make the repo secrets
+- name: make the argocd repo secrets
+  kubernetes.core.k8s:
+    state: present
+    src: "{{ role_path }}/templates/argocd-helm-repo.yml.j2"

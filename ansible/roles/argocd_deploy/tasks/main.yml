@@ -1,3 +1,10 @@
 ---
 
-# configure and populate vault
+- include_tasks: repos.yml
+  loop: "{{ repos }}"
+
+# make the cluster secrets
+- include_tasks: clusters.yml
+  loop: "{{ clusters }}"
+
+# deploy the teleport chart!
