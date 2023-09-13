@@ -1,0 +1,19 @@
+---
+
+- name: initialise vault with given number of key shares and threshold
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ vault_pods[0] }}"
+    command: "vault operator init -key-shares={{ vault_number_key_shares }} -key-threshold={{ vault_key_threshold }} -format=json"
+  register: vault_init_result
+
+- set_fact:
+    vault_init: "{{ vault_init_result.stdout | from_json }}"
+
+- name: save the vault root token and unseal keys to a file
+  local_action: copy content="{{ vault_init }}" dest={{ vault_config_output_folder }}/root-unseal.json
+  
+- include_tasks: unseal.yml
+  loop: "{{ vault_pods|flatten(levels=1) }}"
+  loop_control:
+    loop_var: pod_name

@@ -1,0 +1,6 @@
+---
+
+- include_tasks: applyar.yml
+  loop: "{{ host_configure.roles }}"
+  loop_control:
+    loop_var: role_configure
