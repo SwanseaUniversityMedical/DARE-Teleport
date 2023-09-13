@@ -1,0 +1,14 @@
+---
+- set_fact:
+    policy_name: "{{ policy_file.path | basename | splitext | first }}"
+    policy_content: "{{ lookup('file', '{{ policy_file.path }}') }}"
+
+# shell into pod and run 
+- name: apply this policy to vault
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ vault_pods[0] }}"
+    command: "vault policy write {{ policy_name }} - <<EOF 
+      {{ policy_content }}
+      EOF
+      "

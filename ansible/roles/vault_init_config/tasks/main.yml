@@ -22,9 +22,29 @@
     vault_pods: "{{ vault_pods | default([]) + [ item.metadata.name ] }}"
   with_items: "{{ vault_pods_spec.resources }}"
 
-- name: initialise vault with given number of key shares and threshold
-  kubernetes.core.k8s_exec:
-    namespace: "{{ vault_namespace }}"
-    pod: "{{ vault_pods[0] }}"
-    command: "vault operator init -key-shares={{ vault_number_key_shares }} -key-threshold={{ vault_key_threshold }} -format=json"
-  register: vault_init_result
+- include_tasks: init.yml
+
+# set up kubernetes authentication for each given cluster
+- include_tasks: auth.yml
+  loop: "{{ hosts_configure_auth }}"
+  loop_control:
+    loop_var: remote_host
+
+- name: gather all the policy files
+  find: 
+    paths: "{{ vault_policy_directory }}"
+    patterns: "*.hcl"
+  register: all_policies
+  delegate_to: localhost
+
+- include_tasks: policies.yml
+  loop: "{{ all_policies.files }}"
+  loop_control:
+    loop_var: policy_file
+  when: all_policies.files | length > 0
+
+# set up all auth roles for each cluster
+- include_tasks: authroles.yml
+  loop: "{{ hosts_configure_auth }}"
+  loop_control:
+    loop_var: host_configure

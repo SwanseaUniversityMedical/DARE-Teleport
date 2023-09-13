@@ -1,0 +1,15 @@
+---
+
+- debug:
+    msg: "config role for host {{ host_configure.name }} and role name is {{ role_configure.role_name }}"
+
+- name: apply this role to vault
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ vault_pods[0] }}"
+    command: "vault write auth/{{ host_configure.vault_auth_path }}/role/{{ role_configure.role_name }} \
+      bound_service_account_names={{ role_configure.bound_sa_names }} \
+      bound_service_account_namespaces={{ role_configure.bound_sa_namespaces }} \
+      policies={{ role_configure.token_policies }} \
+      ttl={{ role_configure.token_ttl }}
+    "

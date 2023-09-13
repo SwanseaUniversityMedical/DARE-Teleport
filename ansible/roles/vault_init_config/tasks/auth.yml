@@ -1,0 +1,43 @@
+---
+
+- name: enable kubernetes auth for this host group
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ vault_pods[0] }}"
+    command: "vault auth enable -path={{ remote_host.vault_auth_path }} kubernetes"
+
+- name: get the vault secret
+  kubernetes.core.k8s_info:
+    api_version: v1
+    kind: Secret
+    name: "{{ vault_secret_name }}"
+    namespace: "{{ vault_namespace }}"
+    kubeconfig: "{{ kubeconfig_dir }}"
+  delegate_to: "{{ remote_host.name }}"
+  register: vault_secret_spec
+
+- name: get the kubernetes CA cert
+  shell: kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.certificate-authority-data}' | base64 --decode
+  delegate_to: "{{ remote_host.name }}"
+  register: raw_ca_cert
+
+- name: get the kubernetes host url
+  shell: kubectl config view --raw --minify --flatten --output='jsonpath={.clusters[].cluster.server}'
+  delegate_to: "{{ remote_host.name }}"
+  register: raw_host_url
+
+- set_fact:
+    vault_secret: "{{ vault_secret_spec.resources[0].data.token | b64decode }}"
+    ca_cert: "{{ raw_ca_cert.stdout }}"
+    host_url: "{{ raw_host_url.stdout }}"
+
+- name: set this service account up to be allowed to authenticate to vault
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ vault_pods[0] }}"
+    command: "vault write auth/{{ remote_host.vault_auth_path }}/config \
+      token_reviewer_jwt=\"{{ vault_secret }}\" \
+      kubernetes_host=\"{{ host_url }}\" \
+      kubernetes_ca_cert=\"{{ ca_cert }}\" \
+      issuer=\"https://kubernetes.default.svc.cluster.local\" \
+      disable_iss_validation=\"true\""
