@@ -15,7 +15,7 @@ stringData:
 {% endif %}
 {% if item.ssh_private_key_file is defined %}
   sshPrivateKey: |
-    {{ lookup('file', item.ssh_private_key_file) }}
+{{ lookup('file', item.ssh_private_key_file) | indent(4, True) }}
 {% endif %}
 {% if item.proxy is defined %}
   proxy: {{ item.proxy }}
