@@ -121,3 +121,8 @@
 - import_tasks: set-docker-mirror.yml
   when: 
     - microk8s_docker_proxy
+
+- include_tasks: make-service-accounts.yml
+  when: 
+    - create_argocd_admin_sa
+    - k3s_lead_control_node
