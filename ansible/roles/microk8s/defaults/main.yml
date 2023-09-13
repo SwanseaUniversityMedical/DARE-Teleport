@@ -20,3 +20,7 @@ microk8s_plugins: {}
   # ingress: true             # Ingress controller for external access
   # cert-manager: true
   # rook-ceph: true
+
+create_argocd_admin_sa: false
+
+cluster_certs_output_dir: ""
