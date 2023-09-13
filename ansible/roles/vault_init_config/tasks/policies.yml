@@ -4,6 +4,6 @@
     policy_content: "{{ lookup('file', '{{ policy_file.path }}') }}"
 
 - name: apply policy to vault
-  command: kubectl exec -i --tty=false {{ vault_pod }} -n {{ vault_namespace }} -- vault policy write {{ policy_name }} -
+  command: kubectl exec -i --tty=false {{ vault_pods[0] }} -n {{ vault_namespace }} -- vault policy write {{ policy_name }} -
   args:
     stdin: "{{ policy_content }}"
