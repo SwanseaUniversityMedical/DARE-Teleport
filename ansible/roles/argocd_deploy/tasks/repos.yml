@@ -4,7 +4,7 @@
 - name: make helm repo secret
   kubernetes.core.k8s:
     state: present
-    src: "{{ role_path }}/templates/argocd-helm-repo.yml.j2"
+    src: "{{ role_path }}/templates/argocd-helm-repo.j2"
   when: item.type == "helm"
 
 - name: make git repo secret
