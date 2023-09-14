@@ -8,10 +8,7 @@
 k3s_state: installed
 
 # Use a specific k3s version, if set to "false" we will get the latest
-# k3s_release_version: v1.19.3
-#k3s_release_version: v1.21.4+k3s1
-# k3s_release_version: v1.23.6+k3s1
-k3s_release_version: v1.26.5+k3s1
+k3s_release_version: v1.27.4+k3s1
 
 # Location of the k3s configuration file
 k3s_config_file: "/etc/rancher/k3s/config.yaml"
@@ -49,7 +46,10 @@ k3s_server_config_yaml_d_files: []
 k3s_agent_config_yaml_d_files: []
 
 # A list of templates used for pre-configuring the cluster.
-k3s_server_manifests_templates: []
+k3s_server_manifests_templates: 
+  - "{{ role_path }}/files/manifests/calico/custom-resources.yaml"
+  - "{{ role_path }}/files/manifests/calico/tigera-operator.yaml"
+  - "{{ role_path }}/files/manifests/nvidia/runtimeclass.yaml"
 
 # A list of URLs used for pre-configuring the cluster.
 k3s_server_manifests_urls: []
@@ -95,10 +95,42 @@ k3s_service_after: []
 ##
 # Server Configuration
 ##
-
-k3s_server: {}
-# k3s_server:
-#  listen-port: 6443
+# K3S Server config, don't deploy flannel and set cluster pod CIDR.
+k3s_server:
+  flannel-backend: "none"
+  disable-network-policy: true
+  disable:
+    - traefik
+    - servicelb
+    - local-storage
+  cluster-cidr: 10.53.0.0/16 
+  service-cidr: 10.54.0.0/16
+  protect-kernel-defaults: true
+  secrets-encryption: true
+  kube-apiserver-arg:
+    # - 'admission-control-config-file=/var/lib/rancher/k3s/server/psa.yaml'
+    - 'audit-log-path=/var/lib/rancher/audit/audit.log'
+    - 'audit-policy-file=/var/lib/rancher/audit/audit-policy.yml'
+    - 'audit-log-maxage=30'
+    - 'audit-log-maxbackup=10'    
+    - 'audit-log-maxsize=100'
+    - 'request-timeout=120s'
+    - 'service-account-lookup=true'
+    - 'encryption-provider-config=/etc/k3s-encryption.yaml'
+    #   - 'tls-min-version=VersionTLS12'
+    #     #   - 'oidc-issuer-url=https://keycloak.local/auth/realms/master'
+    #     #   - 'oidc-client-id=oidckube'
+    #     #   - 'oidc-username-claim=email'
+    #     #   - 'oidc-groups-claim=groups'
+    #     #   - 'oidc-groups-claim=groups'
+    #     #   - '/var/lib/rancher/k3s/server/tls/client-ca.crt'
+  kube-controller-manager-arg:
+    - 'terminated-pod-gc-threshold=10'
+    - 'use-service-account-credentials=true'
+  kubelet-arg:
+    - 'streaming-connection-idle-timeout=5m'
+    - 'make-iptables-util-chains=true'
+    - 'event-qps=25'
 
 ##
 # Agent Configuration
@@ -148,6 +180,9 @@ k3s_registries:
 #        # path to the ca file used in the registry
 #        ca_file:
 
+k3s_server_environment:
+  - key: KUBECONFIG
+    value: '/etc/rancher/k3s/k3s.yaml'
 ##
 # Helm ###
 ##

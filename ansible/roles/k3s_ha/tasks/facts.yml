@@ -18,14 +18,6 @@
     - hostvars[item].k3s_control_node
   loop: "{{ ansible_play_hosts }}"
 
-- name: Ensure a count of lead control nodes is generated from ansible_play_hosts
-  ansible.builtin.set_fact:
-    k3s_lead_controller_list: "{{ k3s_lead_controller_list + [ item ] }}"
-  when:
-    - hostvars[item].k3s_lead_control_node is defined
-    - hostvars[item].k3s_lead_control_node
-  loop: "{{ ansible_play_hosts }}"
-
 - name: Ensure a k3s control node is defined if none are found in ansible_play_hosts
   block:
 
@@ -44,20 +36,17 @@
 
   when:
     - k3s_controller_list | length < 1
+    - k3s_build_cluster is defined
+    - k3s_build_cluster
 
 - name: Ensure a primary k3s control node is defined if multiple are found in ansible_play_hosts
   ansible.builtin.set_fact:
     k3s_lead_control_node: true
   when:
-    - k3s_lead_controller_list | length > 1
-    - inventory_hostname == k3s_lead_controller_list[0]
-
-- name: Ensure extra primary k3s control nodes are unset if multiple are found in ansible_play_hosts
-  ansible.builtin.set_fact:
-    k3s_lead_control_node: false
-  when:
-    - k3s_lead_controller_list | length > 1
-    - inventory_hostname != k3s_lead_controller_list[0]
+    - k3s_controller_list is defined
+    - inventory_hostname == k3s_controller_list[0]
+    - k3s_build_cluster is defined
+    - k3s_build_cluster
 
 - name: Ensure ansible_host is mapped to inventory_hostname
   ansible.builtin.blockinfile:
