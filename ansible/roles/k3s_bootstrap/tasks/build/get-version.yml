@@ -21,6 +21,7 @@
   register: k3s_latest_release
   no_log: true
   check_mode: false
+  environment: "{{ proxy_env }}"
 
 - name: Ensure the release version is set as a fact
   ansible.builtin.set_fact:

@@ -1,9 +1,0 @@
-nexus:
-  docker:
-    enabled: true
-    registries:
-      - host: harbor.ukserp.ac.uk
-        port: 8082
-
-service:
-  type: LoadBalancer
