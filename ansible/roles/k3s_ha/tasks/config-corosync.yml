@@ -47,7 +47,6 @@
   become: true
   when:
     - k3s_control_node
-    - not k3s_lead_control_node
 
 - name: configuring corosync
   template:
