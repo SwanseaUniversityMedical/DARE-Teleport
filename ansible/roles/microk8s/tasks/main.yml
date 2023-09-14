@@ -122,6 +122,16 @@
   when: 
     - microk8s_docker_proxy
 
+- name: ensure that pip is installed
+  apt:
+    name:
+      - python3-pip
+    state: present
+
+- name: ensure that the control node has the kubernetes python package installed
+  pip:
+    name: kubernetes
+
 - include_tasks: make-service-accounts.yml
   when: 
     - create_argocd_admin_sa
