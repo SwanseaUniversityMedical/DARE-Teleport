@@ -162,57 +162,6 @@ k3s_cgroup_subsys:
       If you are running Alpine Linux, see:
       https://rancher.com/docs/k3s/latest/en/advanced/#additional-preparation-for-alpine-linux-setup
 
-
-# K3S Server config, don't deploy flannel and set cluster pod CIDR.
-k3s_server:
-  flannel-backend: "none"
-  disable-network-policy: true
-  disable:
-    - traefik
-    - servicelb
-    - local-storage
-  cluster-cidr: 10.53.0.0/16 
-  service-cidr: 10.54.0.0/16
-  protect-kernel-defaults: true
-  secrets-encryption: true
-  kube-apiserver-arg:
-    # - 'admission-control-config-file=/var/lib/rancher/k3s/server/psa.yaml'
-    - 'audit-log-path=/var/lib/rancher/audit/audit.log'
-    - 'audit-policy-file=/var/lib/rancher/audit/audit-policy.yml'
-    - 'audit-log-maxage=30'
-    - 'audit-log-maxbackup=10'    
-    - 'audit-log-maxsize=100'
-    - 'request-timeout=120s'
-    - 'service-account-lookup=true'
-    - 'encryption-provider-config=/etc/k3s-encryption.yaml'
-    #   - 'tls-min-version=VersionTLS12'
-    #     #   - 'oidc-issuer-url=https://keycloak.local/auth/realms/master'
-    #     #   - 'oidc-client-id=oidckube'
-    #     #   - 'oidc-username-claim=email'
-    #     #   - 'oidc-groups-claim=groups'
-    #     #   - 'oidc-groups-claim=groups'
-    #     #   - '/var/lib/rancher/k3s/server/tls/client-ca.crt'
-  kube-controller-manager-arg:
-    - 'terminated-pod-gc-threshold=10'
-    - 'use-service-account-credentials=true'
-  kubelet-arg:
-    - 'streaming-connection-idle-timeout=5m'
-    - 'make-iptables-util-chains=true'
-    - 'event-qps=25'
-
-# Deploy the following k3s server templates.
-k3s_server_manifests_templates:
-  - "manifests/calico/tigera-operator.yaml"
-  - "manifests/calico/custom-resources.yaml"
-  # - "manifests/argocd/argo-base.yaml"
-  # - "manifests/nvidia/runtimeclass.yaml"
-  # - "manifests/opagatekeeper/gatekeeper.yaml"
-  # - "manifests/opagatekeeper/proxy.yaml"
-
-k3s_server_environment:
-  - key: KUBECONFIG
-    value: '/etc/rancher/k3s/k3s.yaml'
-
 # The OS of the Helm redistributable
 helm_os: 'linux'
 
