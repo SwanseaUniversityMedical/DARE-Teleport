@@ -19,6 +19,7 @@ spec:
       prune: true
     syncOptions:  
     - CreateNamespace=true
+    - ServerSideApply=true
   source:
     {{- .Values.appPromStack.source | toYaml | nindent 4 }}
     helm:
