@@ -18,7 +18,7 @@ jobs:
       slack-channel: ${{ vars.SLACK_CHANNEL }}
       filters: |
         chart:
-          - './.github/workflows/release.yaml'
+          - './.github/workflows/on-release.yaml'
           - 'charts/teleport/**'
 
     secrets:
