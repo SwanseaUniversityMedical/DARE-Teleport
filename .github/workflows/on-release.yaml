@@ -32,8 +32,7 @@ jobs:
 
   chart:
     # Build the chart and push it as x.y.z-rc
-    needs:
-      - changes
+    needs: changes
     if: fromJSON(needs.changes.outputs.changes).chart == 'true'
     uses: SwanseaUniversityMedical/workflows/.github/workflows/on-release-chart.yaml@v4.1.0
     with:
