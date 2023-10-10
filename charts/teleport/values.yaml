@@ -44,7 +44,7 @@ appTrino:
     repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
     chart: trino
     # renovate: datasource=helm depName=trino registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
-    targetRevision: 1.1.1
+    targetRevision: 1.4.3
 
 appHive:
   enabled: true
