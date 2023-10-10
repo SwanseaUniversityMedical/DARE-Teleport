@@ -12,6 +12,7 @@
 
 - name: save the vault root token and unseal keys to a file
   local_action: copy content="{{ vault_init }}" dest={{ vault_config_output_folder }}/root-unseal.json
+  become: false
   
 - include_tasks: unseal.yml
   loop: "{{ vault_pods|flatten(levels=1) }}"

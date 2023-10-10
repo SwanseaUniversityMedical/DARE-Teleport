@@ -47,6 +47,7 @@
     patterns: "*.hcl"
   register: all_policies
   delegate_to: localhost
+  become: false
 
 - include_tasks: policies.yml
   loop: "{{ all_policies.files }}"
