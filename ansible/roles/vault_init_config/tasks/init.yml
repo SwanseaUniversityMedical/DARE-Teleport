@@ -18,3 +18,4 @@
   loop: "{{ vault_pods|flatten(levels=1) }}"
   loop_control:
     loop_var: pod_name
+    pause: 15
