@@ -1,0 +1,31 @@
+{{- if .Values.appRabbitMQ.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: app-rabbitmq
+  namespace: {{ .Values.global.application.argocd.namespace }}
+  finalizers:
+  - resources-finalizer.argocd.argoproj.io
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  destination:
+    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appRabbitMQ.namespace }}"
+    server: {{ eq .Values.appRabbitMQ.cluster "" | ternary .Values.global.application.address .Values.appRabbitMQ.cluster }}
+  project: {{ .Values.global.application.argocd.project }}
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:  
+    - CreateNamespace=true
+  source:
+    {{- .Values.appRabbitMQ.source | toYaml | nindent 4 }}
+    helm:
+      valueFiles:
+        - values.yaml
+      {{- if .Values.appRabbitMQ.values }}
+      values: |
+        {{- .Values.appRabbitMQ.values | toYaml | nindent 8 }}
+      {{- end }}
+{{- end }}
