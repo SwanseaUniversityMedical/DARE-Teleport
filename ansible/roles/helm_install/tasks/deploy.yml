@@ -143,6 +143,38 @@
   when:
     - k3s_deploy_vault
 
+# vault config operator
+- name: deploy vault config operator helm chart
+  kubernetes.core.helm:
+    chart_ref: "{{ k3s_helm_install.vault_config_operator.chart_name }}"
+    chart_repo_url: "{{ k3s_helm_install.vault_config_operator.repo_address }}"
+    chart_version: "{{ k3s_helm_install.vault_config_operator.chart_version }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig_dir }}"
+    release_name: "{{ k3s_helm_install.vault_config_operator.install_name }}"
+    release_namespace: "{{ k3s_helm_install.vault_config_operator.install_namespace }}"
+    values_files: "{{ temp_helm_values_fp }}/{{ k3s_helm_install.vault_config_operator.install_values }}"
+    wait: true
+  environment: "{{ proxy_env }}"
+  when:
+    - k3s_deploy_vault_config_operator
+
+# vault secrets operator
+- name: deploy vault secrets operator helm chart
+  kubernetes.core.helm:
+    chart_ref: "{{ k3s_helm_install.vault_secrets_operator.chart_name }}"
+    chart_repo_url: "{{ k3s_helm_install.vault_secrets_operator.repo_address }}"
+    chart_version: "{{ k3s_helm_install.vault_secrets_operator.chart_version }}"
+    create_namespace: true
+    kubeconfig: "{{ kubeconfig_dir }}"
+    release_name: "{{ k3s_helm_install.vault_secrets_operator.install_name }}"
+    release_namespace: "{{ k3s_helm_install.vault_secrets_operator.install_namespace }}"
+    values_files: "{{ temp_helm_values_fp }}/{{ k3s_helm_install.vault_secrets_operator.install_values }}"
+    wait: true
+  environment: "{{ proxy_env }}"
+  when:
+    - k3s_deploy_vault_secrets_operator
+
 # minio operator
 - name: deploy minio operator
   block:
