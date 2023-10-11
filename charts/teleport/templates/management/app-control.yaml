@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-management-website
+  name: management-website
   namespace: {{ .Values.global.management.argocd.namespace }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io

@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-hive
+  name: hive
   namespace: {{ .Values.global.application.argocd.namespace }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io

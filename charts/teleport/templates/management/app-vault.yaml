@@ -2,7 +2,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: app-vault
+  name: vault
   namespace: {{ .Values.global.management.argocd.namespace }}
   finalizers:
   - resources-finalizer.argocd.argoproj.io
