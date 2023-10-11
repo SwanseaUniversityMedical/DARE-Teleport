@@ -31,6 +31,9 @@
 - set_fact:
     vault_secret: "{{ vault_secret_spec.resources[0].data.token | b64decode }}"
     ca_cert: "{{ raw_ca_cert.stdout }}"
+  when: remote_host.name != inventory_hostname
+
+- set_fact:
     host_url: "{{ raw_host_url.stdout }}"
 
 - name: set this service account up to be allowed to authenticate to vault
@@ -45,3 +48,15 @@
       disable_iss_validation=\"true\""
   environment:
     VAULT_TOKEN: "{{ vault_root_token }}"
+  when: remote_host.name != inventory_hostname
+
+- name: set this service account up to be allowed to authenticate to vault
+  kubernetes.core.k8s_exec:
+    namespace: "{{ vault_namespace }}"
+    pod: "{{ vault_pods[0] }}"
+    command: "vault write auth/{{ remote_host.vault_auth_path }}/config \
+      kubernetes_host=\"{{ host_url }}\" \
+      disable_iss_validation=\"true\""
+  environment:
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  when: remote_host.name == inventory_hostname
