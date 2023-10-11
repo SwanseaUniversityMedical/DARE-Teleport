@@ -4,6 +4,8 @@
   kubernetes.core.k8s_exec:
     namespace: "{{ vault_namespace }}"
     pod: "{{ pod_name }}"
-    command: "vault operator unseal {{ vault_init.unseal_keys_b64[ item | int ] }} && sleep 5"
+    command: "vault operator unseal {{ vault_init.unseal_keys_b64[ item | int ] }}"
     kubeconfig: "{{ kubeconfig_dir }}"
   with_sequence: start=0 end="{{ vault_key_threshold - 1 }}"
+  loop_control:
+    pause: 5
