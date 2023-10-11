@@ -1,0 +1,8 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: ca-issuer
+  namespace: {{ cert_manager_install_ns }}
+spec:
+  ca:
+    secretName: ca-key-pair
