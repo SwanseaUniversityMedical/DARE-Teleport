@@ -37,6 +37,8 @@ k3s_deploy_postop: false
 k3s_deploy_nexus: false
 k3s_deploy_minioop: false
 k3s_deploy_vault: false
+k3s_deploy_vault_config_operator: false
+k3s_deploy_vault_secrets_operator: false
 k3s_deploy_extra_manifests: false
 
 helm_values_dir: "helm"
@@ -109,6 +111,20 @@ k3s_helm_install:
     install_namespace: 'vault'
     chart_name: 'vault'
     chart_version: '0.24.1'
+    repo_address: 'https://helm.releases.hashicorp.com'
+    install_values: ''
+  vault_config_operator:
+    install_name: 'vault-config-operator'
+    install_namespace: 'vault-config-operator'
+    chart_name: 'vault-config-operator'
+    chart_version: '0.8.24'
+    repo_address: 'https://redhat-cop.github.io/vault-config-operator'
+    install_values: ''
+  vault_secrets_operator:
+    install_name: 'vault-secrets-operator'
+    install_namespace: 'vault'
+    chart_name: 'vault-secrets-operator'
+    chart_version: '0.2.0'
     repo_address: 'https://helm.releases.hashicorp.com'
     install_values: ''
   extra_manifests_folder: ''
