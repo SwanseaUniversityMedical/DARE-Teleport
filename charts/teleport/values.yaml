@@ -16,6 +16,16 @@ global:
       namespace: argocd
       project: default
 
+appAirflow:
+  enabled: true
+  cluster: ""
+  namespace: airflow
+  source:
+    repoURL: https://airflow-helm.github.io/charts
+    chart: airflow
+    # renovate: datasource=helm depName=airflow registryUrl=https://airflow-helm.github.io/charts
+    targetRevision: 8.7.1
+
 appGuacamole:
   enabled: true
   cluster: ""
