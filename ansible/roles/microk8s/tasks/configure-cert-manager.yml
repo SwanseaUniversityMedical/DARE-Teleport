@@ -1,0 +1,18 @@
+---
+
+- name: read in given tls.crt to variable
+  set_fact:
+    cert_manager_crt: "{{ lookup('file', cert_manager_tls_cert_file)}}"
+    cert_manager_key: "{{ lookup('file', cert_manager_tls_key_file)}}"
+
+- name: create secret with given ca
+  kubernetes.core.k8s:
+    state: present
+    template: '{{ role_path }}/templates/cert-manager-secret.j2'
+    kubeconfig: "{{ kubeconfig_file_location }}/config"
+
+- name: create clusterissuer referencing created cert secret
+  kubernetes.core.k8s:
+    state: present
+    template: '{{ role_path }}/templates/cert-manager-clusterissuer.j2'
+    kubeconfig: "{{ kubeconfig_file_location }}/config"

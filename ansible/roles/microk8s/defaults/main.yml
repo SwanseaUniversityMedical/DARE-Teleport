@@ -24,3 +24,7 @@ microk8s_plugins: {}
 create_argocd_admin_sa: false
 
 cluster_certs_output_dir: ""
+
+cert_manager_install_ns: "cert-manager"
+cert_manager_tls_cert_file: ""
+cert_manager_tls_key_file: ""

@@ -136,3 +136,8 @@
   when: 
     - create_argocd_admin_sa
     - k3s_lead_control_node
+
+- include_tasks: configure-cert-manager.yml
+  when:
+      - "'cert-manager' in microk8s_plugins"
+      - microk8s_plugins['cert-manager']

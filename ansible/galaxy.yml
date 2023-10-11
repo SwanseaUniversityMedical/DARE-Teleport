@@ -1,7 +1,7 @@
 namespace: "dare"
 name: "common"
 description: "Common Ansible Roles used by multiple deployments of DARE-Teleport."
-version: "1.0.0"
+version: "1.1.0"
 readme: "README.md"
 authors:
   - "Alex Lee"
