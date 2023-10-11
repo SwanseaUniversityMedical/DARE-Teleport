@@ -41,9 +41,9 @@ appGuacamole:
   cluster: ""
   namespace: guacamole
   source:
-    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    repoURL: https://harbor.ukserp.ac.uk/dare/chart
     chart: guacamole
-    # renovate: datasource=helm depName=guacamole registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    # renovate: datasource=helm depName=guacamole registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.0.2
 
 appJupyter:
@@ -51,9 +51,9 @@ appJupyter:
   cluster: ""
   namespace: jupyter
   source:
-    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    repoURL: https://harbor.ukserp.ac.uk/dare/chart
     chart: jupyter
-    # renovate: datasource=helm depName=jupyter registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    # renovate: datasource=helm depName=jupyter registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.0.0
 
 appTrino:
@@ -61,9 +61,9 @@ appTrino:
   cluster: ""
   namespace: trino
   source:
-    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    repoURL: https://harbor.ukserp.ac.uk/dare/chart
     chart: trino
-    # renovate: datasource=helm depName=trino registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    # renovate: datasource=helm depName=trino registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.1.1
 
 appHive:
@@ -71,9 +71,9 @@ appHive:
   cluster: ""
   namespace: hive
   source:
-    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    repoURL: https://harbor.ukserp.ac.uk/dare/chart
     chart: hive
-    # renovate: datasource=helm depName=hive registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    # renovate: datasource=helm depName=hive registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.2.0
 
 appMinioTenant:
@@ -101,9 +101,9 @@ appOpa:
   cluster: ""
   namespace: opa
   source:
-    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    repoURL: https://harbor.ukserp.ac.uk/dare/chart
     chart: opa
-    # renovate: datasource=helm depName=opa registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    # renovate: datasource=helm depName=opa registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.0.0
 
 appControl:
@@ -111,9 +111,9 @@ appControl:
   cluster: ""
   namespace: control
   source:
-    repoURL: https://harbor.ukserp.ac.uk/chartrepo/dare
+    repoURL: https://harbor.ukserp.ac.uk/dare/chart
     chart: control
-    # renovate: datasource=helm depName=control registryUrl=https://harbor.ukserp.ac.uk/chartrepo/dare
+    # renovate: datasource=helm depName=control registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.1.0
 
 appKeycloak:
