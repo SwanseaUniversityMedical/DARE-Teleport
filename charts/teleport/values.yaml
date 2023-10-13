@@ -76,6 +76,16 @@ appHive:
     # renovate: datasource=helm depName=hive registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.2.0
 
+appReloader:
+  enabled: true
+  # this needs to be installed alongside Trino, so it uses the Trino cluster value
+  namespace: reloader
+  source:
+    repoURL: https://stakater.github.io/stakater-charts
+    chart: reloader
+    # renovate: datasource=helm depName=reloader registryUrl=https://stakater.github.io/stakater-charts
+    targetRevision: 1.0.43
+
 appMinioTenant:
   enabled: true
   cluster: ""
