@@ -43,7 +43,7 @@ appGuacamole:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: guacamole
-    # renovate: datasource=docker depName=guacamole registryUrl=https://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=chart/guacamole registryUrl=https://harbor.ukserp.ac.uk/dare
     targetRevision: 1.0.2
 
 appJupyter:
@@ -53,7 +53,7 @@ appJupyter:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: jupyter
-    # renovate: datasource=docker depName=jupyter registryUrl=https://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=chart/jupyter registryUrl=https://harbor.ukserp.ac.uk/dare
     targetRevision: 1.0.0
 
 appTrino:
@@ -63,7 +63,7 @@ appTrino:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: trino
-    # renovate: datasource=docker depName=trino registryUrl=https://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=chart/trino registryUrl=https://harbor.ukserp.ac.uk/dare
     targetRevision: 1.1.1
 
 appHive:
@@ -73,7 +73,7 @@ appHive:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: hive
-    # renovate: datasource=docker depName=hive registryUrl=https://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=chart/hive registryUrl=https://harbor.ukserp.ac.uk/dare
     targetRevision: 1.2.0
 
 appReloader:
@@ -113,7 +113,7 @@ appOpa:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: opa
-    # renovate: datasource=docker depName=opa registryUrl=https://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=chart/opa registryUrl=https://harbor.ukserp.ac.uk/dare
     targetRevision: 1.0.0
 
 appControl:
@@ -123,7 +123,7 @@ appControl:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: control
-    # renovate: datasource=docker depName=control registryUrl=https://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=chart/control registryUrl=https://harbor.ukserp.ac.uk/dare-trefx
     targetRevision: 1.1.0
 
 appKeycloak:
