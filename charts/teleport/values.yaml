@@ -54,7 +54,7 @@ appJupyter:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: jupyter
     # renovate: datasource=docker depName=dare/chart/jupyter registryUrl=https://harbor.ukserp.ac.uk
-    targetRevision: 1.0.0
+    targetRevision: 1.3.6
 
 appTrino:
   enabled: true
