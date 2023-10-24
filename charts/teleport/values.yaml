@@ -43,7 +43,7 @@ appGuacamole:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: guacamole
-    # renovate: datasource=helm depName=guacamole registryUrl=oci://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=guacamole registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.0.2
 
 appJupyter:
@@ -53,7 +53,7 @@ appJupyter:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: jupyter
-    # renovate: datasource=helm depName=jupyter registryUrl=oci://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=jupyter registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.0.0
 
 appTrino:
@@ -63,7 +63,7 @@ appTrino:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: trino
-    # renovate: datasource=helm depName=trino registryUrl=oci://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=trino registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.1.1
 
 appHive:
@@ -73,7 +73,7 @@ appHive:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: hive
-    # renovate: datasource=helm depName=hive registryUrl=oci://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=hive registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.2.0
 
 appReloader:
@@ -113,7 +113,7 @@ appOpa:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: opa
-    # renovate: datasource=helm depName=opa registryUrl=oci://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=opa registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.0.0
 
 appControl:
@@ -123,7 +123,7 @@ appControl:
   source:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: control
-    # renovate: datasource=helm depName=control registryUrl=oci://harbor.ukserp.ac.uk/dare/chart
+    # renovate: datasource=docker depName=control registryUrl=https://harbor.ukserp.ac.uk/dare/chart
     targetRevision: 1.1.0
 
 appKeycloak:
