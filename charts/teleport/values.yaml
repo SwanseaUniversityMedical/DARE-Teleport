@@ -64,7 +64,7 @@ appTrino:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: trino
     # renovate: datasource=docker depName=dare/chart/trino registryUrl=https://harbor.ukserp.ac.uk
-    targetRevision: 1.1.1
+    targetRevision: 1.6.1
 
 appHive:
   enabled: true
