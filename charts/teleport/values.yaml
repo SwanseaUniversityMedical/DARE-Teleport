@@ -35,6 +35,11 @@ appAirflow:
     chart: airflow
     # renovate: datasource=helm depName=airflow registryUrl=https://airflow-helm.github.io/charts
     targetRevision: 8.7.1
+  values:
+    airflow:
+      image:
+        repository: harbor.ukserp.ac.uk/dare/airflow/base
+        tag: 1.1.3
 
 appGuacamole:
   enabled: false
