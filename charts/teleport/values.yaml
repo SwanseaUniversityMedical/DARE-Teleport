@@ -44,7 +44,7 @@ appGuacamole:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: guacamole
     # renovate: datasource=docker depName=dare/chart/guacamole registryUrl=https://harbor.ukserp.ac.uk
-    targetRevision: 1.5.2
+    targetRevision: 1.6.1
 
 appJupyter:
   enabled: true
