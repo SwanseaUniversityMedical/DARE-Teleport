@@ -124,7 +124,7 @@ appControl:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: control
     # renovate: datasource=docker depName=dare-trefx/chart/control registryUrl=https://harbor.ukserp.ac.uk
-    targetRevision: 1.23.0
+    targetRevision: 1.24.0
 
 appKeycloak:
   enabled: true
