@@ -114,7 +114,7 @@ appOpa:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: opa
     # renovate: datasource=docker depName=dare/chart/opa registryUrl=https://harbor.ukserp.ac.uk
-    targetRevision: 1.4.8
+    targetRevision: 1.5.0
 
 appControl:
   enabled: true
