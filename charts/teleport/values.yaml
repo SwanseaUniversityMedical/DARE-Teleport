@@ -37,7 +37,7 @@ appAirflow:
     targetRevision: 8.7.1
 
 appGuacamole:
-  enabled: true
+  enabled: false
   cluster: ""
   namespace: guacamole
   source:
@@ -117,7 +117,7 @@ appOpa:
     targetRevision: 1.4.8
 
 appControl:
-  enabled: true
+  enabled: false
   cluster: ""
   namespace: control
   source:
