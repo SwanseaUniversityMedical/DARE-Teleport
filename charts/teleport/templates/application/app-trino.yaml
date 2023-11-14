@@ -10,7 +10,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "2"
 spec:
   destination:
-    namespace: "{{ .Values.global.namespacePrefix }}-{{ .Values.appTrino.namespace }}"
+    namespace: {{ include "teleport.namespace" (dict "Values" .Values "namespace" .Values.appTrino.namespace) }}
     server: {{ eq .Values.appTrino.cluster "" | ternary .Values.global.application.address .Values.appTrino.cluster }}
   project: {{ .Values.global.application.argocd.project }}
   syncPolicy:
