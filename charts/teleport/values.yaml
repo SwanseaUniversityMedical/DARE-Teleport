@@ -149,7 +149,7 @@ appPromStack:
     repoURL: https://prometheus-community.github.io/helm-charts
     chart: kube-prometheus-stack
     # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
-    targetRevision: 46.3.0
+    targetRevision: 55.11.0
 
 appLoki:
   enabled: true
