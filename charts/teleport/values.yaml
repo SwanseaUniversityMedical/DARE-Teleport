@@ -79,7 +79,7 @@ appHive:
     repoURL: harbor.ukserp.ac.uk/dare/chart
     chart: hive
     # renovate: datasource=docker depName=dare/chart/hive registryUrl=https://harbor.ukserp.ac.uk
-    targetRevision: 1.5.4
+    targetRevision: 1.5.5
 
 appReloader:
   enabled: true
