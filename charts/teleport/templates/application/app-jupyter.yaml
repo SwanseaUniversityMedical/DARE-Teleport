@@ -19,6 +19,24 @@ spec:
       prune: true
     syncOptions:  
     - CreateNamespace=true
+    - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - kind: Secret
+      name: hub
+      jsonPointers:
+        - /data/hub.config.CryptKeeper.keys
+        - /data/hub.config.JupyterHub.cookie_secret
+        - /data/hub.config.ConfigurableHTTPProxy.auth_token
+    - group: apps
+      kind: Deployment
+      name: hub
+      jsonPointers:
+        - /spec/template/metadata/annotations/checksum~1secret
+    - group: apps
+      kind: Deployment
+      name: proxy
+      jsonPointers:
+        - /spec/template/metadata/annotations/checksum~1auth-token
   source:
     {{- .Values.appJupyter.source | toYaml | nindent 4 }}
     helm:
