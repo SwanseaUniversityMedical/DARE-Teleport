@@ -39,7 +39,7 @@ appAirflow:
     airflow:
       image:
         repository: harbor.ukserp.ac.uk/dare/airflow/base
-        tag: 1.1.4
+        tag: 1.1.5
 
 appGuacamole:
   enabled: false
