@@ -139,7 +139,7 @@ appKeycloak:
     repoURL: https://charts.bitnami.com/bitnami
     chart: keycloak
     # renovate: datasource=helm depName=keycloak registryUrl=https://charts.bitnami.com/bitnami
-    targetRevision: 15.1.6
+    targetRevision: 18.7.1
 
 appPromStack:
   enabled: true
