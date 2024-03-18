@@ -109,7 +109,7 @@ appVault:
     repoURL: https://helm.releases.hashicorp.com
     chart: vault
     # renovate: datasource=helm depName=vault registryUrl=https://helm.releases.hashicorp.com
-    targetRevision: 0.24.1
+    targetRevision: 0.27.0
 
 appOpa:
   enabled: true
