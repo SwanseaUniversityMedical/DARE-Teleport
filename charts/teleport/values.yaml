@@ -99,7 +99,7 @@ appMinioTenant:
     repoURL: https://operator.min.io/
     chart: tenant
     # renovate: datasource=helm depName=tenant registryUrl=https://operator.min.io/
-    targetRevision: 5.0.6
+    targetRevision: 5.0.14
 
 appVault:
   enabled: true
