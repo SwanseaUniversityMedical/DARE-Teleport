@@ -159,7 +159,7 @@ appLoki:
     repoURL: https://grafana.github.io/helm-charts
     chart: loki-stack
     # renovate: datasource=helm depName=loki-stack registryUrl=https://grafana.github.io/helm-charts
-    targetRevision: 2.9.10
+    targetRevision: 2.10.2
   values:
     loki:
       isDefault: false
